@@ -1,0 +1,1466 @@
+[
+  {
+    "__docId__": 0,
+    "kind": "file",
+    "static": true,
+    "variation": null,
+    "name": "src/bem/bem.js",
+    "memberof": null,
+    "longname": "src/bem/bem.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 24,
+    "content": "/**\r\n * @typedef {string} TBemStringModifier\r\n */\r\n\r\n/**\r\n * @typedef {Array.<TBemStringModifier>} TBemNormalizedModifiers\r\n */\r\n\r\n/**\r\n * @typedef {Object.<TBemStringModifier, boolean>} TBemKeyModifiers\r\n */\r\n\r\n/**\r\n * @typedef {Array.<TBemStringModifier|TBemKeyModifiers>} TBemArrayModifiers\r\n */\r\n\r\n/**\r\n * @typedef {TBemKeyModifiers|TBemArrayModifiers} TBemModifiers\r\n */\r\n\r\n/**\r\n * @type {string}\r\n */\r\nexport const ERROR_MODIFIERS_VALIDATION = 'Modifiers should be either an object or an array of object or strings';\r\n\r\n/**\r\n * @type {string}\r\n */\r\nexport const ERROR_DECORATOR_TARGET_VALIDATION = 'Decorator accepts only functions and classes';\r\n\r\n/**\r\n * @type {string}\r\n */\r\nexport const ERROR_DECORATOR_BLOCKNAME_VALIDATION = 'Decorator parameter should be a string';\r\n\r\n/**\r\n * Generates block className\r\n * @param {string} name\r\n * @param {TBemModifiers} modifiers\r\n * @returns {string}\r\n */\r\nexport function block(name, modifiers) {\r\n\treturn modify(name, modifiers);\r\n}\r\n\r\n/**\r\n * Generates element className\r\n * @param {string} blockName\r\n * @param {string} name\r\n * @param {TBemModifiers} modifiers\r\n * @returns {string}\r\n */\r\nexport function element(blockName, name, modifiers) {\r\n\treturn modify(`${blockName}--${name}`, modifiers);\r\n}\r\n\r\n/**\r\n * Generates modifier className\r\n * @param {string} name\r\n * @param {string} modifier\r\n * @returns {string}\r\n */\r\nexport function modifier(name, modifier) {\r\n\treturn `${name}-${modifier}`;\r\n}\r\n\r\n/**\r\n * Combines selector with modifiers\r\n * @param {string} name\r\n * @param {TBemModifiers} modifiers\r\n * @private\r\n * @returns {string}\r\n */\r\nfunction modify(name, modifiers) {\r\n\tconst normalized = normalizeModifiers(modifiers);\r\n\treturn [name].concat(normalized.map(m => {\r\n\t\treturn modifier(name, m);\r\n\t})).join(' ');\r\n}\r\n\r\n/**\r\n * Normalizes {@link TBemModifiers} to array of strings\r\n * @param {TBemModifiers} modifiers\r\n * @returns {TBemNormalizedModifiers}\r\n */\r\nfunction normalizeModifiers(modifiers) {\r\n\tif (!modifiers) {\r\n\t\treturn [];\r\n\t} else if (isArrayModifiers(modifiers)) {\r\n\t\treturn normalizeArrayModifiers(modifiers);\r\n\t} else if (isKeyModifiers(modifiers)) {\r\n\t\treturn normalizeKeyModifiers(modifiers);\r\n\t} else {\r\n\t\tthrow new Error(ERROR_MODIFIERS_VALIDATION);\r\n\t}\r\n}\r\n\r\n/**\r\n * Normalzies {@Link TBemKeyModifiers} to array of strings\r\n * @param {TBemKeyModifiers} modifiers\r\n * @returns {TBemNormalizedModifiers}\r\n */\r\nfunction normalizeKeyModifiers(modifiers) {\r\n\treturn Object.keys(modifiers).filter(key => !!modifiers[key]);\r\n}\r\n\r\n/**\r\n * Normalizes {@link TBemArrayModifiers} to array of string\r\n * @param {TBemArrayModifiers} modifiers\r\n * @returns {TBemNormalizedModifiers}\r\n */\r\nfunction normalizeArrayModifiers(modifiers) {\r\n\treturn modifiers.map(modifier => {\r\n\t\tif (isStringModifier(modifier)) {\r\n\t\t\treturn modifier;\r\n\t\t} else if (isKeyModifiers(modifier)) {\r\n\t\t\treturn normalizeKeyModifiers(modifier);\r\n\t\t} else {\r\n\t\t\tthrow new Error(ERROR_MODIFIERS_VALIDATION);\r\n\t\t}\r\n\t});\r\n}\r\n\r\n/**\r\n * Checks if modifiers is an object with boolean values for classname keys\r\n * @param {TBemModifiers} modifiers\r\n * @return {boolean}\r\n */\r\nfunction isKeyModifiers(modifiers) {\r\n\treturn !isArrayModifiers(modifiers) && !!modifiers && typeof modifiers === 'object';\r\n}\r\n\r\n/**\r\n * Checks if modifiers is an array of plain strings or {@link TBemKeyModifiers}\r\n * @param {TBemModifiers} modifiers\r\n * @returns {boolean}\r\n */\r\nfunction isArrayModifiers(modifiers) {\r\n\treturn Array.isArray(modifiers);\r\n}\r\n\r\n/**\r\n * Checks if modifier is a string\r\n * @param {TBemModifiers} modifier\r\n * @returns {boolean}\r\n */\r\nfunction isStringModifier(modifier) {\r\n\treturn typeof modifier === 'string';\r\n}\r\n\r\n/**\r\n * Universal helper for creating bem-based classNames\r\n * @param {string} blockName\r\n * @param {string|TBemModifiers} [elementOrBlockModifiers]\r\n * @param {TBemModifiers} [elementModifiers]\r\n * @returns {string}\r\n * @example\r\n * const block = bem('block'); //block\r\n * const blockModifiers = bem('block', ['first', {second: true}]); //block-first block-second\r\n * const blockModifiers2 = bem('block', {second: false}); //block\r\n * const blockElement = bem('block', 'element'); //block--element\r\n * const blockElementModifiers = bem('block', 'element', ['m']); //block--element-m\r\n */\r\nexport default function bem(blockName, elementOrBlockModifiers, elementModifiers) {\r\n\tif (typeof elementOrBlockModifiers === 'string') {\r\n\t\t//block--element || block--element-modifiers\r\n\t\treturn element(blockName, elementOrBlockModifiers, elementModifiers);\r\n\t} else if (isKeyModifiers(elementOrBlockModifiers) || isArrayModifiers(elementOrBlockModifiers)) {\r\n\t\t//block-modifiers\r\n\t\treturn block(blockName, elementOrBlockModifiers);\r\n\t} else if (!elementOrBlockModifiers) {\r\n\t\treturn blockName; //block\r\n\t}\r\n}\r\n\r\n/**\r\n * Class decorator, inject 'bem' method which is bound to passed block name\r\n * @param {String} blockName\r\n * @returns {Function.<Function>}\r\n * @example\r\n * @BEM('foo')\r\n * class Foo extends React.Component {\r\n *  render() {\r\n *   return (\r\n *    <div className={this.bem()}> //foo\r\n *        <div className={this.bem('sub')}></div> //foo--sub\r\n *    </div>\r\n *   );\r\n *  }\r\n * }\r\n */\r\nexport function BEM(blockName) {\r\n\tif (typeof blockName !== 'string') {\r\n\t\tthrow new Error(ERROR_DECORATOR_BLOCKNAME_VALIDATION);\r\n\t}\r\n\r\n\treturn function(target) {\r\n\t\tif (typeof target !== 'function') {\r\n\t\t\tthrow new Error(ERROR_DECORATOR_TARGET_VALIDATION);\r\n\t\t}\r\n\r\n\t\ttarget.prototype.bem = bem.bind(null, blockName);\r\n\t\treturn target;\r\n\t};\r\n}"
+  },
+  {
+    "__docId__": 1,
+    "kind": "typedef",
+    "static": true,
+    "variation": null,
+    "name": "TBemStringModifier",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~TBemStringModifier",
+    "access": null,
+    "description": null,
+    "type": {
+      "types": [
+        "string"
+      ],
+      "optional": false,
+      "name": "TBemStringModifier"
+    }
+  },
+  {
+    "__docId__": 2,
+    "kind": "typedef",
+    "static": true,
+    "variation": null,
+    "name": "TBemNormalizedModifiers",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~TBemNormalizedModifiers",
+    "access": null,
+    "description": null,
+    "type": {
+      "types": [
+        "Array.<TBemStringModifier>"
+      ],
+      "optional": false,
+      "name": "TBemNormalizedModifiers"
+    }
+  },
+  {
+    "__docId__": 3,
+    "kind": "typedef",
+    "static": true,
+    "variation": null,
+    "name": "TBemKeyModifiers",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~TBemKeyModifiers",
+    "access": null,
+    "description": null,
+    "type": {
+      "types": [
+        "Object.<TBemStringModifier, boolean>"
+      ],
+      "optional": false,
+      "name": "TBemKeyModifiers"
+    }
+  },
+  {
+    "__docId__": 4,
+    "kind": "typedef",
+    "static": true,
+    "variation": null,
+    "name": "TBemArrayModifiers",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~TBemArrayModifiers",
+    "access": null,
+    "description": null,
+    "type": {
+      "types": [
+        "Array.<TBemStringModifier",
+        "TBemKeyModifiers>"
+      ],
+      "optional": false,
+      "name": "TBemArrayModifiers"
+    }
+  },
+  {
+    "__docId__": 5,
+    "kind": "typedef",
+    "static": true,
+    "variation": null,
+    "name": "TBemModifiers",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~TBemModifiers",
+    "access": null,
+    "description": null,
+    "type": {
+      "types": [
+        "TBemKeyModifiers",
+        "TBemArrayModifiers"
+      ],
+      "optional": false,
+      "name": "TBemModifiers"
+    }
+  },
+  {
+    "__docId__": 6,
+    "kind": "variable",
+    "static": true,
+    "variation": null,
+    "name": "ERROR_MODIFIERS_VALIDATION",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~ERROR_MODIFIERS_VALIDATION",
+    "access": null,
+    "export": true,
+    "importPath": "dx-util/src/bem/bem.js",
+    "importStyle": "{ERROR_MODIFIERS_VALIDATION}",
+    "description": null,
+    "lineNumber": 24,
+    "type": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 7,
+    "kind": "variable",
+    "static": true,
+    "variation": null,
+    "name": "ERROR_DECORATOR_TARGET_VALIDATION",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~ERROR_DECORATOR_TARGET_VALIDATION",
+    "access": null,
+    "export": true,
+    "importPath": "dx-util/src/bem/bem.js",
+    "importStyle": "{ERROR_DECORATOR_TARGET_VALIDATION}",
+    "description": null,
+    "lineNumber": 29,
+    "type": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 8,
+    "kind": "variable",
+    "static": true,
+    "variation": null,
+    "name": "ERROR_DECORATOR_BLOCKNAME_VALIDATION",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~ERROR_DECORATOR_BLOCKNAME_VALIDATION",
+    "access": null,
+    "export": true,
+    "importPath": "dx-util/src/bem/bem.js",
+    "importStyle": "{ERROR_DECORATOR_BLOCKNAME_VALIDATION}",
+    "description": null,
+    "lineNumber": 34,
+    "type": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 9,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "block",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~block",
+    "access": null,
+    "export": true,
+    "importPath": "dx-util/src/bem/bem.js",
+    "importStyle": "{block}",
+    "description": "Generates block className",
+    "lineNumber": 42,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "TBemModifiers"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "modifiers",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 10,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "element",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~element",
+    "access": null,
+    "export": true,
+    "importPath": "dx-util/src/bem/bem.js",
+    "importStyle": "{element}",
+    "description": "Generates element className",
+    "lineNumber": 53,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "blockName",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "TBemModifiers"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "modifiers",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 11,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "modifier",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~modifier",
+    "access": null,
+    "export": true,
+    "importPath": "dx-util/src/bem/bem.js",
+    "importStyle": "{modifier}",
+    "description": "Generates modifier className",
+    "lineNumber": 63,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "modifier",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 12,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "modify",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~modify",
+    "access": "private",
+    "export": false,
+    "importPath": "dx-util/src/bem/bem.js",
+    "importStyle": null,
+    "description": "Combines selector with modifiers",
+    "lineNumber": 74,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "TBemModifiers"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "modifiers",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 13,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "normalizeModifiers",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~normalizeModifiers",
+    "access": null,
+    "export": false,
+    "importPath": "dx-util/src/bem/bem.js",
+    "importStyle": null,
+    "description": "Normalizes {@link TBemModifiers} to array of strings",
+    "lineNumber": 86,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{TBemNormalizedModifiers}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "TBemModifiers"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "modifiers",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "TBemNormalizedModifiers"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 14,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "normalizeKeyModifiers",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~normalizeKeyModifiers",
+    "access": null,
+    "export": false,
+    "importPath": "dx-util/src/bem/bem.js",
+    "importStyle": null,
+    "description": "Normalzies {@Link TBemKeyModifiers} to array of strings",
+    "lineNumber": 103,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{TBemNormalizedModifiers}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "TBemKeyModifiers"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "modifiers",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "TBemNormalizedModifiers"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 15,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "normalizeArrayModifiers",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~normalizeArrayModifiers",
+    "access": null,
+    "export": false,
+    "importPath": "dx-util/src/bem/bem.js",
+    "importStyle": null,
+    "description": "Normalizes {@link TBemArrayModifiers} to array of string",
+    "lineNumber": 112,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{TBemNormalizedModifiers}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "TBemArrayModifiers"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "modifiers",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "TBemNormalizedModifiers"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 16,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "isKeyModifiers",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~isKeyModifiers",
+    "access": null,
+    "export": false,
+    "importPath": "dx-util/src/bem/bem.js",
+    "importStyle": null,
+    "description": "Checks if modifiers is an object with boolean values for classname keys",
+    "lineNumber": 129,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "TBemModifiers"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "modifiers",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "boolean"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 17,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "isArrayModifiers",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~isArrayModifiers",
+    "access": null,
+    "export": false,
+    "importPath": "dx-util/src/bem/bem.js",
+    "importStyle": null,
+    "description": "Checks if modifiers is an array of plain strings or {@link TBemKeyModifiers}",
+    "lineNumber": 138,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{boolean}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "TBemModifiers"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "modifiers",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "boolean"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 18,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "isStringModifier",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~isStringModifier",
+    "access": null,
+    "export": false,
+    "importPath": "dx-util/src/bem/bem.js",
+    "importStyle": null,
+    "description": "Checks if modifier is a string",
+    "lineNumber": 147,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{boolean}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "TBemModifiers"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "modifier",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "boolean"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 19,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "bem",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~bem",
+    "access": null,
+    "export": true,
+    "importPath": "dx-util/src/bem/bem.js",
+    "importStyle": "bem",
+    "description": "Universal helper for creating bem-based classNames",
+    "examples": [
+      "const block = bem('block'); //block\nconst blockModifiers = bem('block', ['first', {second: true}]); //block-first block-second\nconst blockModifiers2 = bem('block', {second: false}); //block\nconst blockElement = bem('block', 'element'); //block--element\nconst blockElementModifiers = bem('block', 'element', ['m']); //block--element-m"
+    ],
+    "lineNumber": 164,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "blockName",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string",
+          "TBemModifiers"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "elementOrBlockModifiers",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "TBemModifiers"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "elementModifiers",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 20,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "BEM",
+    "memberof": "src/bem/bem.js",
+    "longname": "src/bem/bem.js~BEM",
+    "access": null,
+    "export": true,
+    "importPath": "dx-util/src/bem/bem.js",
+    "importStyle": "{BEM}",
+    "description": "Class decorator, inject 'bem' method which is bound to passed block name",
+    "examples": [
+      "@BEM('foo')\nclass Foo extends React.Component {\n render() {\n  return (\n   <div className={this.bem()}> //foo\n       <div className={this.bem('sub')}></div> //foo--sub\n   </div>\n  );\n }\n}"
+    ],
+    "lineNumber": 192,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{Function.<Function>}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "blockName",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Function.<Function>"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 22,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Infinity",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Infinity",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Infinity",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 23,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "NaN",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~NaN",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 24,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "undefined",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~undefined",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 25,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "null",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~null",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 26,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Object",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 27,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~object",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 28,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Function",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 29,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~function",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 30,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Boolean",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 31,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~boolean",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 32,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Symbol",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Symbol",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 33,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Error",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Error",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 34,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "EvalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/EvalError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~EvalError",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 35,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "InternalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/InternalError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~InternalError",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 36,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "RangeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~RangeError",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 37,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "ReferenceError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~ReferenceError",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 38,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "SyntaxError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~SyntaxError",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 39,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "TypeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~TypeError",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 40,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "URIError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/URIError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~URIError",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 41,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Number",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 42,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~number",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 43,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Date",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Date",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 44,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "String",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~String",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 45,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "string",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~string",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 46,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "RegExp",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~RegExp",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 47,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Array",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 48,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Int8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int8Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int8Array",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 49,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Uint8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint8Array",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 50,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Uint8ClampedArray",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint8ClampedArray",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 51,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Int16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int16Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int16Array",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 52,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Uint16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint16Array",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 53,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Int32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int32Array",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 54,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Uint32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint32Array",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 55,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Float32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Float32Array",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 56,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Float64Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float64Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Float64Array",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 57,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Map",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Map",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 58,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Set",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Set",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 59,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "WeakMap",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~WeakMap",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 60,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "WeakSet",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~WeakSet",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 61,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "ArrayBuffer",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~ArrayBuffer",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 62,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "DataView",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~DataView",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 63,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "JSON",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~JSON",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 64,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Promise",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Promise",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 65,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Generator",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Generator",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 66,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "GeneratorFunction",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~GeneratorFunction",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 67,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Reflect",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Reflect",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 68,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Proxy",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Proxy",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 70,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "CanvasRenderingContext2D",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "longname": "BuiltinExternal/WebAPIExternal.js~CanvasRenderingContext2D",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 71,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "DocumentFragment",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "longname": "BuiltinExternal/WebAPIExternal.js~DocumentFragment",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 72,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Element",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Element",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "longname": "BuiltinExternal/WebAPIExternal.js~Element",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 73,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Event",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Event",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "longname": "BuiltinExternal/WebAPIExternal.js~Event",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 74,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Node",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Node",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "longname": "BuiltinExternal/WebAPIExternal.js~Node",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 75,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "NodeList",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/NodeList",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "longname": "BuiltinExternal/WebAPIExternal.js~NodeList",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 76,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "XMLHttpRequest",
+    "externalLink": "https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "longname": "BuiltinExternal/WebAPIExternal.js~XMLHttpRequest",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 77,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "AudioContext",
+    "externalLink": "https://developer.mozilla.org/en/docs/Web/API/AudioContext",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "longname": "BuiltinExternal/WebAPIExternal.js~AudioContext",
+    "access": null,
+    "description": null,
+    "builtinExternal": true
+  }
+]

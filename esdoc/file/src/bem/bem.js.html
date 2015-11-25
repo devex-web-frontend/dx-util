@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/bem/bem.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="git+https://github.com/devex-web-frontend/dx-util.git">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">bem</div><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-BEM">BEM</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-bem">bem</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-block">block</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-element">element</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modifier">modifier</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ERROR_DECORATOR_BLOCKNAME_VALIDATION">ERROR_DECORATOR_BLOCKNAME_VALIDATION</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ERROR_DECORATOR_TARGET_VALIDATION">ERROR_DECORATOR_TARGET_VALIDATION</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ERROR_MODIFIERS_VALIDATION">ERROR_MODIFIERS_VALIDATION</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-TBemArrayModifiers">TBemArrayModifiers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-TBemKeyModifiers">TBemKeyModifiers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-TBemModifiers">TBemModifiers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-TBemNormalizedModifiers">TBemNormalizedModifiers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-TBemStringModifier">TBemStringModifier</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/bem/bem.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
+ * @typedef {string} TBemStringModifier
+ */
+
+/**
+ * @typedef {Array.&lt;TBemStringModifier&gt;} TBemNormalizedModifiers
+ */
+
+/**
+ * @typedef {Object.&lt;TBemStringModifier, boolean&gt;} TBemKeyModifiers
+ */
+
+/**
+ * @typedef {Array.&lt;TBemStringModifier|TBemKeyModifiers&gt;} TBemArrayModifiers
+ */
+
+/**
+ * @typedef {TBemKeyModifiers|TBemArrayModifiers} TBemModifiers
+ */
+
+/**
+ * @type {string}
+ */
+export const ERROR_MODIFIERS_VALIDATION = &apos;Modifiers should be either an object or an array of object or strings&apos;;
+
+/**
+ * @type {string}
+ */
+export const ERROR_DECORATOR_TARGET_VALIDATION = &apos;Decorator accepts only functions and classes&apos;;
+
+/**
+ * @type {string}
+ */
+export const ERROR_DECORATOR_BLOCKNAME_VALIDATION = &apos;Decorator parameter should be a string&apos;;
+
+/**
+ * Generates block className
+ * @param {string} name
+ * @param {TBemModifiers} modifiers
+ * @returns {string}
+ */
+export function block(name, modifiers) {
+	return modify(name, modifiers);
+}
+
+/**
+ * Generates element className
+ * @param {string} blockName
+ * @param {string} name
+ * @param {TBemModifiers} modifiers
+ * @returns {string}
+ */
+export function element(blockName, name, modifiers) {
+	return modify(`${blockName}--${name}`, modifiers);
+}
+
+/**
+ * Generates modifier className
+ * @param {string} name
+ * @param {string} modifier
+ * @returns {string}
+ */
+export function modifier(name, modifier) {
+	return `${name}-${modifier}`;
+}
+
+/**
+ * Combines selector with modifiers
+ * @param {string} name
+ * @param {TBemModifiers} modifiers
+ * @private
+ * @returns {string}
+ */
+function modify(name, modifiers) {
+	const normalized = normalizeModifiers(modifiers);
+	return [name].concat(normalized.map(m =&gt; {
+		return modifier(name, m);
+	})).join(&apos; &apos;);
+}
+
+/**
+ * Normalizes {@link TBemModifiers} to array of strings
+ * @param {TBemModifiers} modifiers
+ * @returns {TBemNormalizedModifiers}
+ */
+function normalizeModifiers(modifiers) {
+	if (!modifiers) {
+		return [];
+	} else if (isArrayModifiers(modifiers)) {
+		return normalizeArrayModifiers(modifiers);
+	} else if (isKeyModifiers(modifiers)) {
+		return normalizeKeyModifiers(modifiers);
+	} else {
+		throw new Error(ERROR_MODIFIERS_VALIDATION);
+	}
+}
+
+/**
+ * Normalzies {@Link TBemKeyModifiers} to array of strings
+ * @param {TBemKeyModifiers} modifiers
+ * @returns {TBemNormalizedModifiers}
+ */
+function normalizeKeyModifiers(modifiers) {
+	return Object.keys(modifiers).filter(key =&gt; !!modifiers[key]);
+}
+
+/**
+ * Normalizes {@link TBemArrayModifiers} to array of string
+ * @param {TBemArrayModifiers} modifiers
+ * @returns {TBemNormalizedModifiers}
+ */
+function normalizeArrayModifiers(modifiers) {
+	return modifiers.map(modifier =&gt; {
+		if (isStringModifier(modifier)) {
+			return modifier;
+		} else if (isKeyModifiers(modifier)) {
+			return normalizeKeyModifiers(modifier);
+		} else {
+			throw new Error(ERROR_MODIFIERS_VALIDATION);
+		}
+	});
+}
+
+/**
+ * Checks if modifiers is an object with boolean values for classname keys
+ * @param {TBemModifiers} modifiers
+ * @return {boolean}
+ */
+function isKeyModifiers(modifiers) {
+	return !isArrayModifiers(modifiers) &amp;&amp; !!modifiers &amp;&amp; typeof modifiers === &apos;object&apos;;
+}
+
+/**
+ * Checks if modifiers is an array of plain strings or {@link TBemKeyModifiers}
+ * @param {TBemModifiers} modifiers
+ * @returns {boolean}
+ */
+function isArrayModifiers(modifiers) {
+	return Array.isArray(modifiers);
+}
+
+/**
+ * Checks if modifier is a string
+ * @param {TBemModifiers} modifier
+ * @returns {boolean}
+ */
+function isStringModifier(modifier) {
+	return typeof modifier === &apos;string&apos;;
+}
+
+/**
+ * Universal helper for creating bem-based classNames
+ * @param {string} blockName
+ * @param {string|TBemModifiers} [elementOrBlockModifiers]
+ * @param {TBemModifiers} [elementModifiers]
+ * @returns {string}
+ * @example
+ * const block = bem(&apos;block&apos;); //block
+ * const blockModifiers = bem(&apos;block&apos;, [&apos;first&apos;, {second: true}]); //block-first block-second
+ * const blockModifiers2 = bem(&apos;block&apos;, {second: false}); //block
+ * const blockElement = bem(&apos;block&apos;, &apos;element&apos;); //block--element
+ * const blockElementModifiers = bem(&apos;block&apos;, &apos;element&apos;, [&apos;m&apos;]); //block--element-m
+ */
+export default function bem(blockName, elementOrBlockModifiers, elementModifiers) {
+	if (typeof elementOrBlockModifiers === &apos;string&apos;) {
+		//block--element || block--element-modifiers
+		return element(blockName, elementOrBlockModifiers, elementModifiers);
+	} else if (isKeyModifiers(elementOrBlockModifiers) || isArrayModifiers(elementOrBlockModifiers)) {
+		//block-modifiers
+		return block(blockName, elementOrBlockModifiers);
+	} else if (!elementOrBlockModifiers) {
+		return blockName; //block
+	}
+}
+
+/**
+ * Class decorator, inject &apos;bem&apos; method which is bound to passed block name
+ * @param {String} blockName
+ * @returns {Function.&lt;Function&gt;}
+ * @example
+ * @BEM(&apos;foo&apos;)
+ * class Foo extends React.Component {
+ *  render() {
+ *   return (
+ *    &lt;div className={this.bem()}&gt; //foo
+ *        &lt;div className={this.bem(&apos;sub&apos;)}&gt;&lt;/div&gt; //foo--sub
+ *    &lt;/div&gt;
+ *   );
+ *  }
+ * }
+ */
+export function BEM(blockName) {
+	if (typeof blockName !== &apos;string&apos;) {
+		throw new Error(ERROR_DECORATOR_BLOCKNAME_VALIDATION);
+	}
+
+	return function(target) {
+		if (typeof target !== &apos;function&apos;) {
+			throw new Error(ERROR_DECORATOR_TARGET_VALIDATION);
+		}
+
+		target.prototype.bem = bem.bind(null, blockName);
+		return target;
+	};
+}</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.4.3)</span></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

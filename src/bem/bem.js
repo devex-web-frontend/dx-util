@@ -28,6 +28,9 @@ export const ERROR_MODIFIERS_VALIDATION = 'Modifiers should be either an object 
  */
 export const ERROR_DECORATOR_TARGET_VALIDATION = 'Decorator accepts only functions and classes';
 
+/**
+ * @type {string}
+ */
 export const ERROR_DECORATOR_BLOCKNAME_VALIDATION = 'Decorator parameter should be a string';
 
 /**
@@ -171,7 +174,7 @@ export default function bem(blockName, elementOrBlockModifiers, elementModifiers
 }
 
 /**
- * Class decorator, inject 'bem' method which is bound to passed block name
+ * Class decorator, injects 'bem' method which is bound to passed block name
  * @param {String} blockName
  * @returns {Function.<Function>}
  * @example
