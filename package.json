@@ -1,0 +1,38 @@
+{
+  "name": "dx-util",
+  "version": "0.0.0",
+  "description": "Common utilities fro dx-projects",
+  "main": "./src/",
+  "engines": {
+    "npm": "^3.0.0"
+  },
+  "scripts": {
+    "test": "npm run eslint && npm run jest",
+    "jest": "jest",
+    "eslint": "eslint --config ./node_modules/eslint-config-dx/.eslintrc --ext .js ./src",
+    "esdoc": "esdoc -c ./config/esdoc.js",
+    "start": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devex-web-frontend/dx-util.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/devex-web-frontend/dx-util/issues"
+  },
+  "homepage": "https://github.com/devex-web-frontend/dx-util#readme",
+  "dependencies": {
+    "esdoc": "^0.4.3"
+  },
+  "jest": {
+    "scriptPreprocessor": "<rootDir>/node_modules/babel-jest"
+  },
+  "devDependencies": {
+    "babel": "^5.8.34",
+    "babel-jest": "^5.3.0",
+    "eslint": "^1.10.1",
+    "eslint-config-dx": "github:devex-web-frontend/eslint-config-dx"
+  }
+}
