@@ -23,8 +23,7 @@
     "url": "https://github.com/devex-web-frontend/dx-util/issues"
   },
   "homepage": "https://github.com/devex-web-frontend/dx-util#readme",
-  "dependencies": {
-  },
+  "dependencies": {},
   "jest": {
     "scriptPreprocessor": "<rootDir>/node_modules/babel-jest"
   },
@@ -33,6 +32,7 @@
     "babel-jest": "^5.3.0",
     "esdoc": "^0.4.3",
     "eslint": "^1.10.1",
-    "eslint-config-dx": "devex-web-frontend/eslint-config-dx"
+    "eslint-config-dx": "devex-web-frontend/eslint-config-dx",
+    "jest-cli": "^0.8.0"
   }
 }
