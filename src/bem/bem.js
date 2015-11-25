@@ -24,6 +24,13 @@
 export const ERROR_MODIFIERS_VALIDATION = 'Modifiers should be either an object or an array of object or strings';
 
 /**
+ * @type {string}
+ */
+export const ERROR_DECORATOR_TARGET_VALIDATION = 'Decorator accepts only functions and classes';
+
+export const ERROR_DECORATOR_BLOCKNAME_VALIDATION = 'Decorator parameter should be a string';
+
+/**
  * Generates block className
  * @param {string} name
  * @param {TBemModifiers} modifiers
@@ -180,7 +187,15 @@ export default function bem(blockName, elementOrBlockModifiers, elementModifiers
  * }
  */
 export function BEM(blockName) {
+	if (typeof blockName !== 'string') {
+		throw new Error(ERROR_DECORATOR_BLOCKNAME_VALIDATION);
+	}
+
 	return function(target) {
+		if (typeof target !== 'function') {
+			throw new Error(ERROR_DECORATOR_TARGET_VALIDATION);
+		}
+
 		target.prototype.bem = bem.bind(null, blockName);
 		return target;
 	};
