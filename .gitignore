@@ -51,3 +51,4 @@ crashlytics-build.properties
 
 npm-debug.log
 node_modules
+esdoc
