@@ -13,7 +13,7 @@ describe('bem', () => {
 			expect(block('foo', null)).toBe('foo');
 			expect(block('foo', undefined)).toBe('foo');
 		});
-		iit('should operate complex nested modifiers', () => {
+		it('should operate complex nested modifiers', () => {
 			expect(block.bind(null, 'foo', ['1', {a: '2'}, [3, {b: '4'}]])).not.toThrow();
 		});
 	});
