@@ -1,17 +1,17 @@
 /**
- * @typedef {string} TBemStringModifier
+ * @typedef {string|number} TBemPlainModifier
  */
 
 /**
- * @typedef {Array.<TBemStringModifier>} TBemNormalizedModifiers
+ * @typedef {Array.<TBemPlainModifier>} TBemNormalizedModifiers
  */
 
 /**
- * @typedef {Object.<TBemStringModifier, boolean>} TBemKeyModifiers
+ * @typedef {Object.<TBemPlainModifier, boolean>} TBemKeyModifiers
  */
 
 /**
- * @typedef {Array.<TBemStringModifier|TBemKeyModifiers>} TBemArrayModifiers
+ * @typedef {Array.<TBemPlainModifier|TBemKeyModifiers|TBemNormalizedModifiers>} TBemArrayModifiers
  */
 
 /**
@@ -21,7 +21,8 @@
 /**
  * @type {string}
  */
-export const ERROR_MODIFIERS_VALIDATION = 'Modifiers should be either an object or an array of object or strings';
+export const ERROR_MODIFIERS_VALIDATION =
+	'Modifiers should be either an object or an array of objects, strings or numbers';
 
 /**
  * @type {string}
@@ -105,20 +106,22 @@ function normalizeKeyModifiers(modifiers) {
 }
 
 /**
- * Normalizes {@link TBemArrayModifiers} to array of string
+ * Recursively normalizes {@link TBemArrayModifiers} to array of string
  * @param {TBemArrayModifiers} modifiers
  * @returns {TBemNormalizedModifiers}
  */
 function normalizeArrayModifiers(modifiers) {
-	return modifiers.map(modifier => {
-		if (isStringModifier(modifier)) {
-			return modifier;
+	return modifiers.reduce((acc, modifier) => {
+		if (isPlainModifier(modifier)) {
+			return acc.concat(modifier);
 		} else if (isKeyModifiers(modifier)) {
-			return normalizeKeyModifiers(modifier);
+			return acc.concat(normalizeKeyModifiers(modifier));
+		} else if (isArrayModifiers(modifier)) {
+			return acc.concat(normalizeArrayModifiers(modifier));
 		} else {
 			throw new Error(ERROR_MODIFIERS_VALIDATION);
 		}
-	});
+	}, []);
 }
 
 /**
@@ -144,8 +147,8 @@ function isArrayModifiers(modifiers) {
  * @param {TBemModifiers} modifier
  * @returns {boolean}
  */
-function isStringModifier(modifier) {
-	return typeof modifier === 'string';
+function isPlainModifier(modifier) {
+	return typeof modifier === 'string' || typeof modifier === 'number';
 }
 
 /**

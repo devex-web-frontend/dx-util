@@ -13,14 +13,8 @@ describe('bem', () => {
 			expect(block('foo', null)).toBe('foo');
 			expect(block('foo', undefined)).toBe('foo');
 		});
-		it('should throw on wrong modifiers', () => {
-			expect(block.bind(null, 'foo', ['m', ['nested_array']])).toThrow();
-			expect(block.bind(null, 'foo', [
-				'm',
-				{
-					m2: ['nested_array']
-				}
-			]));
+		iit('should operate complex nested modifiers', () => {
+			expect(block.bind(null, 'foo', ['1', {a: '2'}, [3, {b: '4'}]])).not.toThrow();
 		});
 	});
 
