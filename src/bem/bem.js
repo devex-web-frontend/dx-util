@@ -36,7 +36,7 @@ export const ERROR_DECORATOR_BLOCKNAME_VALIDATION = 'Decorator parameter should 
 /**
  * Generates block className
  * @param {string} name
- * @param {TBemModifiers} modifiers
+ * @param {TBemModifiers} [modifiers]
  * @returns {string}
  */
 export function block(name, modifiers) {
@@ -47,7 +47,7 @@ export function block(name, modifiers) {
  * Generates element className
  * @param {string} blockName
  * @param {string} name
- * @param {TBemModifiers} modifiers
+ * @param {TBemModifiers} [modifiers]
  * @returns {string}
  */
 export function element(blockName, name, modifiers) {
@@ -67,7 +67,7 @@ export function modifier(name, modifier) {
 /**
  * Combines selector with modifiers
  * @param {string} name
- * @param {TBemModifiers} modifiers
+ * @param {TBemModifiers} [modifiers]
  * @private
  * @returns {string}
  */
@@ -80,7 +80,7 @@ function modify(name, modifiers) {
 
 /**
  * Normalizes {@link TBemModifiers} to array of strings
- * @param {TBemModifiers} modifiers
+ * @param {TBemModifiers} [modifiers]
  * @returns {TBemNormalizedModifiers}
  */
 function normalizeModifiers(modifiers) {
