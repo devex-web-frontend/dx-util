@@ -1,0 +1,22 @@
+{
+  "name": "dx-util",
+  "version": "0.1.3",
+  "description": "Common utilities fro dx-projects",
+  "main": "./src/",
+  "authors": [
+    "agalakov <agalakov@devexperts.com>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/devex-web-frontend/dx-util",
+  "moduleType": [
+    "es6"
+  ],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
