@@ -38,10 +38,6 @@
     "esdoc": "^0.4.3",
     "eslint": "^1.10.1",
     "eslint-config-dx": "devex-web-frontend/eslint-config-dx",
-    "jest-cli": "^0.4.19",
-    "react": "^0.14.7"
-  },
-  "peerDependencies": {
-    "react": "*"
+    "jest-cli": "^0.4.19"
   }
 }

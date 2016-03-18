@@ -1,5 +1,3 @@
-import React from 'react';
-
 /**
  * @typedef {string|number} TBemPlainModifier
  */
@@ -180,7 +178,6 @@ export default function bem(blockName, elementOrBlockModifiers, elementModifiers
 
 /**
  * Class decorator, injects 'bem' method which is bound to passed block name
- * If target extends React.Component, then injects propTypes and defaultProps for modifiers array
  * @param {String} blockName
  * @returns {Function.<Function>}
  * @example
@@ -203,21 +200,6 @@ export function BEM(blockName) {
 	return function(target) {
 		if (typeof target !== 'function') {
 			throw new Error(ERROR_DECORATOR_TARGET_VALIDATION);
-		}
-
-		if (target.prototype instanceof React.Component) {
-			if (!target.propTypes || target.propTypes && !target.propTypes.modifiers) {
-				target.propTypes = Object.assign({}, target.propTypes, {
-					modifiers: React.PropTypes.arrayOf(
-						React.PropTypes.string
-					)
-				});
-			}
-			if (!target.defaultProps || target.defaultProps && !target.defaultProps.modifiers) {
-				target.defaultProps = Object.assign({}, target.defaultProps, {
-					modifiers: []
-				});
-			}
 		}
 
 		target.prototype.bem = bem.bind(null, blockName);
