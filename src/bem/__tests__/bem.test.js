@@ -1,5 +1,7 @@
-jest.dontMock('../bem.js');
+jest.autoMockOff();
+
 const {['default']: bem, block, element, modifier, BEM} = require('../bem.js');
+const React = require('react');
 
 describe('bem', () => {
 	describe('block', () => {
@@ -55,6 +57,11 @@ describe('bem', () => {
 
 		}
 		const foo = new Foo();
+
+		@BEM('foo')
+		class FooComponent extends React.Component {
+
+		}
 		it('should inject bem() method to target prototype', () => {
 			expect(Foo.prototype.bem).toBeDefined();
 			expect(foo.bem).toBeDefined();
@@ -63,6 +70,12 @@ describe('bem', () => {
 			expect(foo.bem()).toBe('foo');
 			expect(foo.bem('bar')).toBe('foo--bar');
 		});
+		it('should extend propTypes and defaultProps with modifiers array', () => {
+			expect(FooComponent.propTypes).toBeDefined();
+			expect(FooComponent.propTypes.modifiers).toBeDefined();
+			expect(FooComponent.defaultProps).toBeDefined();
+			expect(FooComponent.defaultProps.modifiers).toEqual([]);
+		});
 	});
 });
 
@@ -70,7 +83,6 @@ describe('bem', () => {
 //FIXME: place this tests here until upgrade to jest > 0.4
 //jest <= 0.4 breaks on multiple file tests on windows
 ////////////////////////////////////////
-jest.dontMock('../../string/string.js');
 const {dasherize, camelize, capitalize, randomId, decapitalize} = require('../../string/string.js');
 describe('string', () => {
 	describe('dasherize', () => {
