@@ -1,6 +1,5 @@
 /**
  * Re-exports.
- * Re-exports.
  */
 
 export {default as debounce} from './debounce';
