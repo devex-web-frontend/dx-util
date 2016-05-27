@@ -1,6 +1,6 @@
 jest.unmock('../string.js');
 
-import {dasherize, camelize, capitalize, randomId, decapitalize} from '../string';
+import {dasherize, camelize, capitalize, randomId, decapitalize, pluralize3, pluralize2} from '../string';
 
 describe('string', () => {
 	describe('dasherize', () => {
@@ -38,6 +38,67 @@ describe('string', () => {
 	describe('decapitalize', () => {
 		it('should replace first letter with noncapital', () => {
 			expect(decapitalize('Foo')).toBe('foo');
+		});
+	});
+
+	describe('pluralize', () => {
+		it('should take correct value for 3 base declensions', () => {
+			const declensions = [
+				'one',
+				'two-three-four',
+				'zero-many'
+			];
+			expect(pluralize3(0, declensions)).toBe('zero-many');
+			expect(pluralize3(1, declensions)).toBe('one');
+			expect(pluralize3(2, declensions)).toBe('two-three-four');
+			expect(pluralize3(3, declensions)).toBe('two-three-four');
+			expect(pluralize3(4, declensions)).toBe('two-three-four');
+			expect(pluralize3(5, declensions)).toBe('zero-many');
+			expect(pluralize3(6, declensions)).toBe('zero-many');
+			expect(pluralize3(7, declensions)).toBe('zero-many');
+			expect(pluralize3(8, declensions)).toBe('zero-many');
+			expect(pluralize3(9, declensions)).toBe('zero-many');
+			expect(pluralize3(10, declensions)).toBe('zero-many');
+			expect(pluralize3(11, declensions)).toBe('zero-many');
+			expect(pluralize3(12, declensions)).toBe('zero-many');
+			expect(pluralize3(13, declensions)).toBe('zero-many');
+			expect(pluralize3(14, declensions)).toBe('zero-many');
+			expect(pluralize3(15, declensions)).toBe('zero-many');
+			expect(pluralize3(16, declensions)).toBe('zero-many');
+			expect(pluralize3(17, declensions)).toBe('zero-many');
+			expect(pluralize3(18, declensions)).toBe('zero-many');
+			expect(pluralize3(19, declensions)).toBe('zero-many');
+			expect(pluralize3(20, declensions)).toBe('zero-many');
+			expect(pluralize3(21, declensions)).toBe('one');
+		});
+
+		it('should take correct value for 2 base declensions', () => {
+			const declensions = [
+				'one',
+				'zero-many'
+			];
+			expect(pluralize2(0, declensions)).toBe('zero-many');
+			expect(pluralize2(1, declensions)).toBe('one');
+			expect(pluralize2(2, declensions)).toBe('zero-many');
+			expect(pluralize2(3, declensions)).toBe('zero-many');
+			expect(pluralize2(4, declensions)).toBe('zero-many');
+			expect(pluralize2(5, declensions)).toBe('zero-many');
+			expect(pluralize2(6, declensions)).toBe('zero-many');
+			expect(pluralize2(7, declensions)).toBe('zero-many');
+			expect(pluralize2(8, declensions)).toBe('zero-many');
+			expect(pluralize2(9, declensions)).toBe('zero-many');
+			expect(pluralize2(10, declensions)).toBe('zero-many');
+			expect(pluralize2(11, declensions)).toBe('zero-many');
+			expect(pluralize2(12, declensions)).toBe('zero-many');
+			expect(pluralize2(13, declensions)).toBe('zero-many');
+			expect(pluralize2(14, declensions)).toBe('zero-many');
+			expect(pluralize2(15, declensions)).toBe('zero-many');
+			expect(pluralize2(16, declensions)).toBe('zero-many');
+			expect(pluralize2(17, declensions)).toBe('zero-many');
+			expect(pluralize2(18, declensions)).toBe('zero-many');
+			expect(pluralize2(19, declensions)).toBe('zero-many');
+			expect(pluralize2(20, declensions)).toBe('zero-many');
+			expect(pluralize2(21, declensions)).toBe('one');
 		});
 	});
 });

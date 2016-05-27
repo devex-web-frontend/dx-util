@@ -64,3 +64,37 @@ export function capitalize(string) {
 export function decapitalize(string) {
 	return string.slice(0, 1).toLowerCase() + string.slice(1);
 }
+
+/**
+ * Chooses correct value for passed number (1, 2-4, 0 or many) for three base declensions (RUS)
+ * @param {Number} number
+ * @param {Array.<String>} declensions
+ * @returns {String}
+ */
+export function pluralize3(number, declensions) {
+	const cases = [2, 0, 1, 1, 1, 2];
+	number = Math.floor(Math.abs(number));
+	if (number % 100 > 4 && number % 100 < 20) {
+		return declensions[2];
+	} else if (number % 10 < 5) {
+		return declensions[cases[number % 10]];
+	} else {
+		return declensions[cases[5]];
+	}
+}
+
+/**
+ * Chooses correct value for passed number (1, 0 or many) for two base declensions (EN, etc.)
+ * @param {Number} number
+ * @param {Array.<String>} declensions
+ * @returns {String}
+ */
+export function pluralize2(number, declensions) {
+	number = Math.floor(Math.abs(number));
+
+	if (number % 10 === 1 && number !== 11) {
+		return declensions[0];
+	} else {
+		return declensions[1];
+	}
+}
