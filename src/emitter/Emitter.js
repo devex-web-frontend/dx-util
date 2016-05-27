@@ -57,6 +57,7 @@ export default class Emitter {
 	 * @protected
 	 * @param {TEmitterEvent} event
 	 * @param {...any} args
+	 * FIXME: this method is different from its implementation in the Emitter.ts. Why?
 	 */
 	emit(event, ...args) {
 		if (this._events[event]) {
