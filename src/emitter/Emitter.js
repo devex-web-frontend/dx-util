@@ -8,6 +8,7 @@
 
 /**
  * Basic event emitter
+ * @class Emitter
  */
 export default class Emitter {
 	/**
@@ -20,6 +21,7 @@ export default class Emitter {
 	 * Binds handler to specified event
 	 * @param {TEmitterEvent} event
 	 * @param {Function} handler
+	 * @returns {Function}
 	 */
 	on(event, handler) {
 		if (this._events[event]) {
@@ -27,6 +29,7 @@ export default class Emitter {
 		} else {
 			this._events[event] = [handler];
 		}
+		return this.off.bind(this, event, handler);
 	}
 
 	/**
@@ -52,14 +55,14 @@ export default class Emitter {
 		}
 	}
 
+	//noinspection JSValidateJSDoc - do not add ...args to arguments for performance reasons
 	/**
 	 * Emits event
 	 * @protected
 	 * @param {TEmitterEvent} event
-	 * @param {...any} args
-	 * FIXME: this method is different from its implementation in the Emitter.ts. Why?
+	 * @param {...*} args
 	 */
-	emit(event, ...args) {
+	_emit(event) {
 		if (this._events[event]) {
 			this._events[event].forEach(handler => handler.apply(this, Array.prototype.slice.call(arguments, 1)));
 		}
