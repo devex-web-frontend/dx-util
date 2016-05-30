@@ -1,4 +1,4 @@
-import Emitter from '../emitter/Emitter.ts';
+import Emitter from '../emitter/Emitter';
 
 /**
  * @typedef {Function} TCollectionIterationCallback
@@ -35,12 +35,13 @@ export const E_COLLECTION = {
 
 /**
  * Basic observable collection
- * @template T
+ * @class Collection
+ * @extends Emitter
+ * @template TCollectionItem
  */
 export default class Collection extends Emitter {
-	//noinspection JSDuplicatedDeclaration
 	/**
-	 * @param {Array<T>} [items=[]]
+	 * @param {Array<TCollectionItem>} [items=[]]
 	 * @param {TCollectionOptions} [options={}]
 	 */
 	constructor(items = [], options = {}) {
@@ -53,7 +54,7 @@ export default class Collection extends Emitter {
 		this._options = Object.assign({}, options);
 
 		/**
-		 * @type {Array<T>}
+		 * @type {Array<TCollectionItem>}
 		 * @private
 		 */
 		this._items = items.slice();
@@ -62,7 +63,7 @@ export default class Collection extends Emitter {
 	/**
 	 * Returns fresh new shiny copy of collection
 	 * @param {TCollectionOptions} [options={}]
-	 * @returns {Collection<T>}
+	 * @returns {Collection<TCollectionItem>}
 	 */
 	clone(options = {}) {
 		return new Collection(this._items.slice(), Object.assign({}, this._options, options));
@@ -70,7 +71,7 @@ export default class Collection extends Emitter {
 
 	/**
 	 * Adds item to collection
-	 * @param {T} item
+	 * @param {TCollectionItem} item
 	 */
 	add(item) {
 		this._requireWriteAccess();
@@ -81,7 +82,7 @@ export default class Collection extends Emitter {
 
 	/**
 	 * Removes item from collection
-	 * @param {T} item
+	 * @param {TCollectionItem} item
 	 */
 	remove(item) {
 		this._requireWriteAccess();
@@ -106,7 +107,7 @@ export default class Collection extends Emitter {
 	/**
 	 * Tries to find element by callback and throw if not found
 	 * @param {TCollectionIterationCallback} callback
-	 * @returns {T}
+	 * @returns {TCollectionItem}
 	 * @throws
 	 */
 	find(callback) {
@@ -122,7 +123,7 @@ export default class Collection extends Emitter {
 	/**
 	 * Filters collection by callback
 	 * @param {TCollectionIterationCallback} callback
-	 * @returns {Array<T>}
+	 * @returns {Array<TCollectionItem>}
 	 */
 	filter(callback) {
 		//do not pass callback directly to not give access to items arrays as 3rd argument
@@ -168,7 +169,7 @@ export default class Collection extends Emitter {
 
 	/**
 	 * Checks if collection contains item
-	 * @param {T} item
+	 * @param {TCollectionItem} item
 	 * @returns {boolean}
 	 */
 	contains(item) {
