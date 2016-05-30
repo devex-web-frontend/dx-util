@@ -1,6 +1,7 @@
 jest.unmock('../Collection.js');
+jest.unmock('../../emitter/Emitter.js');
 
-import Collection from '../Collection';
+import Collection, {E_COLLECTION} from '../Collection';
 
 describe('Collection', () => {
 	/**
@@ -20,17 +21,43 @@ describe('Collection', () => {
 	});
 
 	it('should add items', () => {
+		expect(collection.contains(4)).toBeFalsy();
+		const onAdd = jest.fn();
+		const onChange = jest.fn();
+		collection.on(E_COLLECTION.ITEM_ADD, onAdd);
+		collection.on(E_COLLECTION.CHANGE, onChange);
 		collection.add(4);
+		collection.off(E_COLLECTION.ITEM_ADD, onAdd);
+		collection.off(E_COLLECTION.CHANGE, onChange);
+		expect(onAdd.mock.calls).toEqual([[4]]);
+		expect(onChange.mock.calls.length).toBe(1);
 		expect(collection.contains(4)).toBeTruthy();
 	});
 
 	it('should remove items', () => {
+		expect(collection.contains(1)).toBeTruthy();
+		const onRemove = jest.fn();
+		const onChange = jest.fn();
+		const unsubscribe = collection.on(E_COLLECTION.ITEM_REMOVE, onRemove);
+		collection.on(E_COLLECTION.CHANGE, onChange);
 		collection.remove(1);
+		unsubscribe();
+		collection.off(E_COLLECTION.CHANGE, onChange);
+		expect(onRemove.mock.calls).toEqual([[1]]);
+		expect(onChange.mock.calls.length).toBe(1);
 		expect(collection.contains(1)).toBeFalsy();
 	});
 
 	it('should clear', () => {
+		const onClear = jest.fn();
+		const onChange = jest.fn();
+		collection.on(E_COLLECTION.CLEAR, onClear);
+		collection.on(E_COLLECTION.CHANGE, onChange);
 		collection.clear();
+		collection.off(E_COLLECTION.CLEAR, onClear);
+		collection.off(E_COLLECTION.CHANGE, onChange);
+		expect(onClear.mock.calls.length).toBe(1);
+		expect(onChange.mock.calls.length).toBe(1);
 		expect(collection.contains(1)).toBeFalsy();
 		expect(collection.contains(2)).toBeFalsy();
 		expect(collection.contains(3)).toBeFalsy();
@@ -48,7 +75,6 @@ describe('Collection', () => {
 	it('should iterate', () => {
 		const callback = jest.fn();
 		collection.forEach(callback);
-		console.log(callback.mock.calls);
 		expect(callback.mock.calls.length).toBe(3);
 		expect(callback.mock.calls[0][0]).toBe(1);
 		expect(callback.mock.calls[1][0]).toBe(2);
