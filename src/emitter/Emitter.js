@@ -62,9 +62,9 @@ export default class Emitter {
 	 * @param {TEmitterEvent} event
 	 * @param {...*} args
 	 */
-	_emit(event) {
+	_emit(event, ...args) {
 		if (this._events[event]) {
-			this._events[event].forEach(handler => handler.apply(this, Array.prototype.slice.call(arguments, 1)));
+			this._events[event].forEach(handler => handler.apply(this, args));
 		}
 	}
 }
