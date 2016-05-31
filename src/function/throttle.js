@@ -10,20 +10,19 @@
  * duration; but if you’d like to disable the execution on the leading edge, pass {leading: false}.
  * To disable execution on the trailing edge, pass {trailing: false}.
  * @param {Function} func Function to decorate
- * @param {Number} wait Delay in ms
- * @param {TThrottlingOptions} [options] Throttling options
+ * @param {Number} [wait=0] Delay in ms
+ * @param {TThrottlingOptions} [options={}] Throttling options
  * @returns {Function} Decorated function
  */
-export default function throttle(func, wait, options) {
+export default function throttle(func, wait = 0, options = {}) {
 	let context;
 	let args;
 	let result;
 	let timeout = null;
 	let previous = 0;
-	let opts = options || {};
 
 	let later = () => {
-		previous = opts.leading === false ? 0 : Date.now();
+		previous = options.leading === false ? 0 : Date.now();
 		timeout = null;
 		result = func.apply(context, args);
 
@@ -34,7 +33,7 @@ export default function throttle(func, wait, options) {
 
 	return function() {
 		let now = Date.now();
-		if (!previous && opts.leading === false) {
+		if (!previous && options.leading === false) {
 			previous = now;
 		}
 
@@ -52,9 +51,22 @@ export default function throttle(func, wait, options) {
 			if (!timeout) {
 				context = args = null;
 			}
-		} else if (!timeout && opts.trailing !== false) {
+		} else if (!timeout && options.trailing !== false) {
 			timeout = setTimeout(later, remaining);
 		}
 		return result;
 	};
 };
+
+/**
+ * Class method decorator for {@link throttle}.
+ * @param {Number} [wait=0] Delay in ms
+ * @param {TThrottlingOptions} [options={}] Throttling options
+ * @returns {Function}
+ */
+export function THROTTLE(wait = 0, options = {}) {
+	return function(target, prop, descriptor) {
+		descriptor.value = throttle(descriptor.value, wait, options);
+		return descriptor;
+	};
+}
