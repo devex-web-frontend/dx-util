@@ -3,11 +3,11 @@
  * The function will be called after it stops being called for N milliseconds.
  * If immediate is passed, trigger the function on the leading edge, instead of the trailing.
  * @param {Function} func Function to decorate
- * @param {Number} wait Delay in ms
- * @param {Boolean} [immediate] Should be function invoked on the leading edge
+ * @param {Number} [wait=0] Delay in ms
+ * @param {Boolean} [immediate=false] Should be function invoked on the leading edge
  * @returns {Function} Decorated function
  */
-export default function debounce(func, wait, immediate) {
+export default function debounce(func, wait = 0, immediate = false) {
 	let timeout;
 	let args;
 	let context;
@@ -49,3 +49,17 @@ export default function debounce(func, wait, immediate) {
 		return result;
 	};
 };
+
+/**
+ * Class method decorator for {@link debounce}.
+ * @param {Number} [wait=0] Delay in ms
+ * @param {Boolean} [immediate=false] Should be function invoked on the leading edge
+ * @returns {Function}
+ * @constructor
+ */
+export function DEBOUNCE(wait = 0, immediate = false) {
+	return function(target, prop, descriptor) {
+		descriptor.value = debounce(descriptor.value, wait, immediate);
+		return descriptor;
+	};
+}
