@@ -3,7 +3,7 @@
  * @param {Function} fn
  * @returns {Function}
  */
-export default function memoize(fn) {
+export function memoize(fn) {
 	const storage = {};
 	return function() {
 		const args = Array.prototype.slice.call(arguments);
@@ -20,6 +20,8 @@ export default function memoize(fn) {
 		return storage[key];
 	}.bind(this);
 }
+
+export default memoize;
 
 /**
  * Decorator for {@link memoize} function

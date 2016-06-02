@@ -1,8 +1,10 @@
 jest.unmock('../debounce.js');
 jest.unmock('../throttle.js');
+jest.unmock('../memoize.js');
 
 import debounce, {DEBOUNCE} from '../debounce';
 import throttle, {THROTTLE} from '../throttle';
+import memoize, {MEMOIZE} from '../memoize';
 
 describe('function', () => {
 	describe('debounce', () => {
@@ -58,7 +60,7 @@ describe('function', () => {
 			expect(callback.mock.calls.length).toBe(2);
 		});
 	});
-	
+
 	describe('THROTTLE', () => {
 		it('should decorate class method', () => {
 			const callback = jest.fn();
@@ -77,6 +79,78 @@ describe('function', () => {
 
 			jest.runAllTimers();
 			decorated.throttled();
+			expect(callback.mock.calls.length).toBe(2);
+		});
+	});
+
+	describe('memoize', () => {
+		it('should memoize passed function for it\'s arguments', () => {
+			const callback = jest.fn();
+			const fn = memoize(function(a, b) {
+				callback();
+				return a + b;
+			});
+			expect(fn(1, 2)).toBe(3);
+			expect(fn(1, 2)).toBe(3);
+			expect(callback.mock.calls.length).toBe(1);
+		});
+
+		it('should throw on invalid arguments', () => {
+			const fn = memoize(function() {
+			});
+			expect(fn.bind(null, [])).toThrow();
+			expect(fn.bind(null, {})).toThrow();
+		});
+	});
+
+	describe('MEMOIZE', () => {
+		it('should decorate getter', () => {
+			const callback = jest.fn();
+			const foo = new class {
+				@MEMOIZE
+				get bar() {
+					callback();
+					return 1;
+				}
+			};
+			expect(foo.bar).toBe(1);
+			expect(foo.bar).toBe(1);
+			expect(callback.mock.calls.length).toBe(1);
+		});
+
+		it('should decorate methods', () => {
+			const callback = jest.fn();
+			const foo = new class {
+				@MEMOIZE
+				bar(a, b) {
+					callback();
+					return a + b;
+				}
+			};
+			expect(foo.bar('1', '2')).toBe('12');
+			expect(foo.bar('1', '2')).toBe('12');
+			expect(callback.mock.calls.length).toBe(1);
+		});
+
+		it('should support static fields', () => {
+			const callback = jest.fn();
+			class Foo {
+				@MEMOIZE
+				static getBar() {
+					callback();
+					return 1;
+				}
+
+				@MEMOIZE
+				static get bar() {
+					callback();
+					return 1;
+				}
+			}
+			expect(Foo.getBar()).toBe(1);
+			expect(Foo.getBar()).toBe(1);
+			expect(Foo.bar).toBe(1);
+			expect(Foo.bar).toBe(1);
 			expect(callback.mock.calls.length).toBe(2);
 		});
 	});
