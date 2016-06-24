@@ -63,6 +63,16 @@ describe('Collection', () => {
 		expect(collection.contains(3)).toBeFalsy();
 	});
 
+	it('should provide length getter', () => {
+		collection.clear();
+		expect(collection.length).toBe(0);
+		collection.add(1);
+		collection.add(2);
+		expect(collection.length).toBe(2);
+		collection.remove(2);
+		expect(collection.length).toBe(1);
+	});
+
 	it('should find and throw', () => {
 		expect(collection.find(item => item === 1)).toBe(1);
 		expect(collection.find.bind(null, item => item === 4)).toThrow();

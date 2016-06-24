@@ -41,6 +41,14 @@ export const E_COLLECTION = {
  */
 export default class Collection extends Emitter {
 	/**
+	 * Length
+	 * @returns {Number}
+	 */
+	get length() {
+		return this._items.length;
+	}
+
+	/**
 	 * @param {Array<TCollectionItem>} [items=[]]
 	 * @param {TCollectionOptions} [options={}]
 	 */
