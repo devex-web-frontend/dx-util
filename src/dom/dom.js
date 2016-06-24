@@ -1,4 +1,5 @@
 import {capitalize} from 'dx-util/src/string/string';
+
 /**
  * Get bounding client rect of given element
  * @param {HTMLElement} element
