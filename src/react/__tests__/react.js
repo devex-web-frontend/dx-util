@@ -1,7 +1,43 @@
 jest.disableAutomock();
-import {PURE, DISPOSABLE} from '../react';
+import {shouldComponentUpdate, PURE, DISPOSABLE} from '../react';
 
 describe('react', () => {
+	describe('shouldComponentUpdate', () => {
+		it('should check for shallow equality', () => {
+			const props = {
+				a: 'a',
+				b: 0
+			};
+
+			const state = {
+				a: 'a',
+				b: 0
+			};
+
+			expect(shouldComponentUpdate(
+				props,
+				state,
+				props,
+				state
+			)).toBeFalsy();
+			expect(shouldComponentUpdate(
+				props,
+				state,
+				Object.assign({}, props, {
+					a: 'b'
+				}),
+				state
+			)).toBeTruthy();
+			expect(shouldComponentUpdate(
+				props,
+				state,
+				props,
+				Object.assign({}, state, {
+					b: 1
+				})
+			));
+		});
+	});
 	describe('PURE decorator', () => {
 		it('should decorate passed class with shouldComponentUpdate', () => {
 			//
@@ -24,22 +60,23 @@ describe('react', () => {
 			const foo = new Foo();
 			expect(Foo.prototype.shouldComponentUpdate).toBeDefined();
 			expect(foo.shouldComponentUpdate).toBeDefined();
-			expect(foo.shouldComponentUpdate(
-				foo.props,
-				foo.state
-			)).toBeFalsy();
-			expect(foo.shouldComponentUpdate(
-				Object.assign({}, foo.props, {
-					a: 'b'
-				}),
-				foo.state
-			)).toBeTruthy();
-			expect(foo.shouldComponentUpdate(
-				foo.props,
-				Object.assign({}, foo.state, {
-					b: 1
-				})
-			));
+		});
+		it('should include base shouldComponentUpdate to resulting condition', () => {
+			//
+			@PURE
+			class Foo {
+				props = {
+					a: 1
+				}
+
+				shouldComponentUpdate() {
+					return false;
+				}
+			}
+			const foo = new Foo();
+			expect(foo.shouldComponentUpdate({
+				a: 2 //value is different
+			})).toBeFalsy(); //but base shouldComponentUpdate returns false
 		});
 	});
 
@@ -74,6 +111,7 @@ describe('react', () => {
 				constructor() {
 					this._using([callback]);
 				}
+
 				componentWillUnmount() {
 					componentWillUnmount();
 				}
