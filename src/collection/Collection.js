@@ -166,6 +166,18 @@ export default class Collection extends Emitter {
 	}
 
 	/**
+	 * Reduces collection with callback and initial value
+	 * @param {function(T, TCollectionItem, number):T} callback
+	 * @param {T} initial
+	 * @returns {T}
+	 * @template {T,TCollectionItem}
+	 */
+	reduce(callback, initial) {
+		//do not pass callback directly to not give access to items arrays as 3rd argument
+		return this._items.reduce((acc, element, index) => callback(acc, element, index), initial);
+	}
+
+	/**
 	 * Checks if any element satisfies callback
 	 * @param {TCollectionIterationCallback} callback
 	 * @returns {boolean}

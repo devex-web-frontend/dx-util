@@ -103,6 +103,14 @@ describe('Collection', () => {
 		expect(collection.map(item => item * item)).toEqual([1, 4, 9]);
 	});
 
+	it('should reduce', () => {
+		expect(collection.reduce((acc, item, i) => {
+			acc.push(0);
+			acc.push(item);
+			return acc;
+		}, [])).toEqual([0, 1, 0, 2, 0, 3]);
+	});
+
 	it('should some', () => {
 		expect(collection.some(item => item === 1)).toBeTruthy();
 		expect(collection.some(item => item === 4)).toBeFalsy();
