@@ -73,6 +73,14 @@ describe('Collection', () => {
 		expect(collection.length).toBe(1);
 	});
 
+	it('should prove items getter and return a copy', () => {
+		collection.clear();
+		collection.add(1);
+		const items = collection.items;
+		collection.add(2);
+		expect(items).toEqual([1]);
+	});
+
 	it('should find and throw', () => {
 		expect(collection.find(item => item === 1)).toBe(1);
 		expect(collection.find.bind(null, item => item === 4)).toThrow();

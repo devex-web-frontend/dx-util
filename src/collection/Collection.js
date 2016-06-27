@@ -49,6 +49,14 @@ export default class Collection extends Emitter {
 	}
 
 	/**
+	 * Items copy
+	 * @returns {Array.<TCollectionItem>}
+	 */
+	get items() {
+		return this._items.slice();
+	}
+
+	/**
 	 * @param {Array<TCollectionItem>} [items=[]]
 	 * @param {TCollectionOptions} [options={}]
 	 */
