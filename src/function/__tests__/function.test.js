@@ -1,10 +1,9 @@
-jest.unmock('../debounce.js');
-jest.unmock('../throttle.js');
-jest.unmock('../memoize.js');
+jest.disableAutomock();
 
 import debounce, {DEBOUNCE} from '../debounce';
 import throttle, {THROTTLE} from '../throttle';
 import memoize, {MEMOIZE} from '../memoize';
+import {DISPOSABLE} from '../disposable';
 
 describe('function', () => {
 	describe('debounce', () => {
@@ -152,6 +151,29 @@ describe('function', () => {
 			expect(Foo.bar).toBe(1);
 			expect(Foo.bar).toBe(1);
 			expect(callback.mock.calls.length).toBe(2);
+		});
+	});
+
+	describe('DISPOSABLE', () => {
+		it('should decorate class', () => {
+			//
+			@DISPOSABLE
+			class Foo {
+			}
+			expect(Foo.prototype._using).toBeDefined();
+			expect(Foo.prototype.dispose).toBeDefined();
+		});
+		it('should implement disposing', () => {
+			const callback = jest.fn();
+			@DISPOSABLE
+			class Foo {
+				constructor() {
+					this._using([callback]);
+				}
+			}
+			const foo = new Foo();
+			foo.dispose();
+			expect(callback).toBeCalled();
 		});
 	});
 });
