@@ -27,7 +27,7 @@ export function PURE(target) {
 	 * @returns {boolean}
 	 */
 	target.prototype.shouldComponentUpdate = function(newProps, newState) {
-		return (!oldShouldComponentUpdate || oldShouldComponentUpdate(newProps, newState)) &&
+		return (!oldShouldComponentUpdate || oldShouldComponentUpdate.call(this, newProps, newState)) &&
 			shouldComponentUpdate(this.props, this.state, newProps, newState);
 	};
 	return target;
