@@ -1,0 +1,1 @@
+export {is, shallowEqual} from './fb';
