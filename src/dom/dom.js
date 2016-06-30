@@ -25,29 +25,6 @@ export function getBoundingClientRect(element) {
 }
 
 /**
- * Get size elelemt
- * @param {HTMLElement} element
- * @returns {{height: number, width: number}}
- */
-export function getElementSize(element) {
-	return {
-		height: element.offsetHeight,
-		width: element.offsetWidth
-	};
-}
-
-/**
- * Get scroll page
- * @returns {{scrollX: (Number|number), scrollY: (Number|number)}}
- */
-export function getPageScroll() {
-	return {
-		scrollX: (window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft),
-		scrollY: (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop)
-	};
-}
-
-/**
  * Set all styles from provided object to the element
  * @param {HTMLElement} el Target element
  * @param {Object} styles
