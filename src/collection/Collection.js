@@ -167,7 +167,7 @@ export default class Collection extends Emitter {
 
 	/**
 	 * Reduces collection with callback and initial value
-	 * @param {function(T, TCollectionItem, number):T} callback
+	 * @param {function(acc:T, element:TCollectionItem, index:number):T} callback
 	 * @param {T} initial
 	 * @returns {T}
 	 * @template {T,TCollectionItem}
