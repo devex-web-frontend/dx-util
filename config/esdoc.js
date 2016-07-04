@@ -3,5 +3,10 @@ module.exports = {
 	destination: './esdoc',
 	excludes: [
 		'__tests__'
+	],
+	plugins: [
+		{
+			name: 'esdoc-es7-plugin'
+		}
 	]
 };
