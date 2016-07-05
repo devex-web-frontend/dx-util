@@ -41,6 +41,22 @@ describe('function', () => {
 			decorated.debounced(2);
 			expect(callback.mock.calls.length).toBe(1);
 		});
+
+		it('should decorate properties', () => {
+			const callback = jest.fn();
+			const foo = new class {
+				@DEBOUNCE(100)
+				bar = () => {
+					callback();
+				}
+			};
+			foo.bar();
+			expect(callback).not.toBeCalled();
+			jest.runAllTimers();
+			expect(callback).toBeCalled();
+			foo.bar();
+			expect(callback.mock.calls.length).toBe(1);
+		});
 	});
 
 	describe('throttle', () => {
@@ -56,6 +72,26 @@ describe('function', () => {
 
 			jest.runAllTimers();
 			throttled();
+			expect(callback.mock.calls.length).toBe(2);
+		});
+
+		it('should decorate properties', () => {
+			const callback = jest.fn();
+			const foo = new class {
+				@THROTTLE(100)
+				bar = () => {
+					callback();
+				}
+			};
+
+			foo.bar();
+			expect(callback).toBeCalled();
+
+			foo.bar();
+			expect(callback.mock.calls.length).toBe(1);
+
+			jest.runAllTimers();
+			foo.bar();
 			expect(callback.mock.calls.length).toBe(2);
 		});
 	});
@@ -122,6 +158,20 @@ describe('function', () => {
 			const foo = new class {
 				@MEMOIZE
 				bar(a, b) {
+					callback();
+					return a + b;
+				}
+			};
+			expect(foo.bar('1', '2')).toBe('12');
+			expect(foo.bar('1', '2')).toBe('12');
+			expect(callback.mock.calls.length).toBe(1);
+		});
+
+		it('should decorate properties', () => {
+			const callback = jest.fn();
+			const foo = new class {
+				@MEMOIZE
+				bar = (a, b) => {
 					callback();
 					return a + b;
 				}

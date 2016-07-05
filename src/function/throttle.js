@@ -66,7 +66,16 @@ export default function throttle(func, wait = 0, options = {}) {
  */
 export function THROTTLE(wait = 0, options = {}) {
 	return function(target, prop, descriptor) {
-		descriptor.value = throttle(descriptor.value, wait, options);
+		if (descriptor.initializer) {
+			const old = descriptor.initializer;
+			descriptor.initializer = function initializer() {
+				return throttle(old.call(this), wait, options);
+			};
+		} else if (descriptor.get) {
+			descriptor.get = throttle(descriptor.get, wait, options);
+		} else if (descriptor.value) {
+			descriptor.value = throttle(descriptor.value, wait, options);
+		}
 		return descriptor;
 	};
 }

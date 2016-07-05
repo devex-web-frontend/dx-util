@@ -1,6 +1,6 @@
 {
   "name": "dx-util",
-  "version": "0.10.8",
+  "version": "0.10.9",
   "description": "Common utilities for dx-projects",
   "main": "./src/",
   "engines": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "postinstall": "bower install",
-    "test": "npm run eslint && npm run jest",
+    "test": "npm run eslint && npm run jest -- --coverage",
     "jest": "jest",
     "eslint": "eslint --config ./node_modules/eslint-config-dx/.eslintrc --ext .js ./src",
     "esdoc": "esdoc -c ./config/esdoc.js",
@@ -26,7 +26,6 @@
     "url": "https://github.com/devex-web-frontend/dx-util/issues"
   },
   "homepage": "https://github.com/devex-web-frontend/dx-util#readme",
-  "dependencies": {},
   "jest": {
     "scriptPreprocessor": "<rootDir>/node_modules/babel-jest"
   },
@@ -39,6 +38,7 @@
     "bower": "^1.7.9",
     "dx-flow": "github:devex-web-frontend/dx-flow",
     "esdoc": "^0.4.7",
+    "esdoc-es7-plugin": "0.0.3",
     "eslint": "^1.10.1",
     "eslint-config-dx": "github:devex-web-frontend/eslint-config-dx",
     "jest-cli": "12.0.2"
