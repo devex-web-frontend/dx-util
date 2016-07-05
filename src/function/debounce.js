@@ -59,7 +59,16 @@ export default function debounce(func, wait = 0, immediate = false) {
  */
 export function DEBOUNCE(wait = 0, immediate = false) {
 	return function(target, prop, descriptor) {
-		descriptor.value = debounce(descriptor.value, wait, immediate);
+		if (descriptor.initializer) {
+			const old = descriptor.initializer;
+			descriptor.initializer = function initializer() {
+				return debounce(old.call(this), wait, immediate);
+			};
+		} else if (descriptor.get) {
+			descriptor.get = debounce(descriptor.get, wait, immediate);
+		} else if (descriptor.value) {
+			descriptor.value = debounce(descriptor.value, wait, immediate);
+		}
 		return descriptor;
 	};
 }

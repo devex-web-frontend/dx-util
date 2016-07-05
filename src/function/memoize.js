@@ -31,19 +31,16 @@ export default memoize;
  * @returns {Object} descriptor
  */
 export function MEMOIZE(target, property, descriptor) {
-	if (descriptor.get) {
-		const getter = descriptor.get;
-		let getterValue;
-		descriptor.get = function() {
-			if (typeof getterValue === 'undefined') {
-				getterValue = getter();
-			}
-			return getterValue;
+	if (descriptor.initializer) {
+		//noinspection JSDuplicatedDeclaration
+		const old = descriptor.initializer;
+		descriptor.initializer = function initializer() {
+			return memoize(old.call(this));
 		};
-		//getter
+	} else if (descriptor.get) {
+		descriptor.get = memoize(descriptor.get);
 	} else if (descriptor.value) {
-		//method
-		descriptor.value = memoize.call(target, descriptor.value);
+		descriptor.value = memoize(descriptor.value);
 	}
 	return descriptor;
 }
