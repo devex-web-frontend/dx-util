@@ -42,7 +42,7 @@ export function DISPOSABLE(target) {
 	 * @type {class}
 	 */
 	const disposable = fdisposable(target);
-	//noinspection JSUnresolvedVariable
+	//noinspection JSDuplicatedDeclaration
 	const componentWillUnmount = disposable.prototype.componentWillUnmount;
 	disposable.prototype.componentWillUnmount = function() {
 		if (componentWillUnmount) {
@@ -51,4 +51,48 @@ export function DISPOSABLE(target) {
 		this.dispose();
 	};
 	return disposable;
+}
+
+/**
+ * @param {{}} cssModule
+ * @returns {function(target: class):class}
+ */
+export function CSS(cssModule) {
+	return function(target) {
+		//noinspection JSDuplicatedDeclaration
+		const {componentWillMount, componentWillReceiveProps} = target.prototype;
+		target.prototype.css = Object.assign({}, cssModule);
+		target.prototype.componentWillMount = function() {
+			if (this.props.css) {
+				this.css = concatObjectValues(cssModule, this.props.css);
+			}
+
+			if (componentWillMount) {
+				componentWillMount();
+			}
+		};
+		target.prototype.componentWillReceiveProps = function(props) {
+			if (this.props.css !== props.css) {
+				this.css = concatObjectValues(cssModule, props.css);
+			}
+
+			if (componentWillReceiveProps) {
+				componentWillReceiveProps();
+			}
+		};
+	};
+}
+
+/**
+ * Merges second object into first by concatinating values with same keys
+ * @param {{}} object1
+ * @param {{}} [object2={}]
+ * @returns {{}}
+ */
+function concatObjectValues(object1, object2 = {}) {
+	const result = Object.assign({}, object1);
+	Object.keys(object2).forEach(key => {
+		result[key] = `${result[key] || ''} ${object2[key]}`;
+	});
+	return result;
 }

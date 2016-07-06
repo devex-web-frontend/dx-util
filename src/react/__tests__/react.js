@@ -1,5 +1,5 @@
 jest.disableAutomock();
-import {shouldComponentUpdate, PURE, DISPOSABLE} from '../react';
+import {shouldComponentUpdate, PURE, DISPOSABLE, CSS} from '../react';
 
 describe('react', () => {
 	describe('shouldComponentUpdate', () => {
@@ -120,6 +120,59 @@ describe('react', () => {
 			c.componentWillUnmount();
 			expect(callback).toBeCalled();
 			expect(componentWillUnmount).toBeCalled();
+		});
+	});
+
+	describe('CSS decorator', () => {
+		const css = {
+			container: 'container',
+			test: 'original'
+		};
+		const componentWillMount = jest.fn();
+		const componentWillReceiveProps = jest.fn();
+		@CSS(css)
+		class Foo {
+			componentWillMount() {
+				componentWillMount();
+			}
+
+			componentWillReceiveProps() {
+				componentWillReceiveProps();
+			}
+		}
+		const foo = new Foo();
+		it('should decorate and inject passed initial css to prototype', () => {
+			expect(Foo.prototype.css).toEqual(css);
+		});
+		it('should inject css names from props on mount and on recieve props', () => {
+			const newCss = {
+				test: 'test'
+			};
+			foo.props  = {
+				css: newCss
+			};
+			foo.componentWillMount();
+			expect(Foo.prototype.css).toEqual(css); //prototype is still clean
+			expect(foo.css).toEqual({
+				container: 'container',
+				test: 'original test'
+			}); //instance is merged
+			expect(componentWillMount).toBeCalled(); //old componentWillMount is also called
+			const newCss2 = {
+				test: 'test2'
+			};
+			const newProps = {
+				css: newCss2
+			};
+			foo.componentWillReceiveProps(newProps);
+			expect(Foo.prototype.css).toEqual(css); //prototype is still clean
+			expect(foo.css).toEqual({
+				container: 'container',
+				test: 'original test2'
+			});
+			foo.componentWillReceiveProps({}); //pass empty props without css
+			expect(Foo.prototype.css).toEqual(css); //prototype is still clean
+			expect(foo.css).toEqual(css); //should take original css module
 		});
 	});
 });
