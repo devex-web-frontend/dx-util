@@ -78,6 +78,39 @@ describe('react', () => {
 				a: 2 //value is different
 			})).toBeFalsy(); //but base shouldComponentUpdate returns false
 		});
+		it('should check css object for equality when using with @CSS', () => {
+			const css = {
+				container: 'container'
+			};
+			const css2 = { //different objects with same structure
+				test: 'test'
+			};
+			const css3 = { //different objects with same structure
+				test: 'test'
+			};
+			const css4 = {
+				test: 'bla'
+			};
+			@CSS(css, {
+				compare: true
+			})
+			@PURE
+			class Foo {
+				props = {
+					css: css2 //this.css is a mix of css and css2
+				}
+			}
+			const foo = new Foo();
+			expect(foo.shouldComponentUpdate({ //same css
+				css: css2
+			})).toBeFalsy();
+			expect(foo.shouldComponentUpdate({ //different css but with same structure
+				css: css3
+			})).toBeFalsy();
+			expect(foo.shouldComponentUpdate({ //different css
+				css: css4
+			})).toBeTruthy();
+		});
 	});
 
 	describe('DISPOSABLE', () => {
@@ -129,15 +162,15 @@ describe('react', () => {
 			test: 'original'
 		};
 		const componentWillMount = jest.fn();
-		const componentWillReceiveProps = jest.fn();
+		const componentWillUpdate = jest.fn();
 		@CSS(css)
 		class Foo {
 			componentWillMount() {
 				componentWillMount();
 			}
 
-			componentWillReceiveProps() {
-				componentWillReceiveProps();
+			componentWillUpdate() {
+				componentWillUpdate();
 			}
 		}
 		const foo = new Foo();
@@ -148,7 +181,7 @@ describe('react', () => {
 			const newCss = {
 				test: 'test'
 			};
-			foo.props  = {
+			foo.props = {
 				css: newCss
 			};
 			foo.componentWillMount();
@@ -164,13 +197,15 @@ describe('react', () => {
 			const newProps = {
 				css: newCss2
 			};
-			foo.componentWillReceiveProps(newProps);
+			foo.componentWillUpdate(newProps);
+			expect(componentWillUpdate).toBeCalled();
 			expect(Foo.prototype.css).toEqual(css); //prototype is still clean
 			expect(foo.css).toEqual({
 				container: 'container',
 				test: 'original test2'
 			});
-			foo.componentWillReceiveProps({}); //pass empty props without css
+			foo.componentWillUpdate({}); //pass empty props without css
+			expect(componentWillUpdate).toBeCalled();
 			expect(Foo.prototype.css).toEqual(css); //prototype is still clean
 			expect(foo.css).toEqual(css); //should take original css module
 		});
