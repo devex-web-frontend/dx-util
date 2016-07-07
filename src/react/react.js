@@ -47,19 +47,17 @@ export function PURE(target) {
 
 		if (shouldCheckCSS) {
 			//now we need to remove css object from original props to avoid checking by shouldComponentUpdate
-			const thisPropsCss = this.props.css;
-			delete this.props['css'];
-			const newPropsCss = newProps.css;
-			delete newProps['css'];
+			const thisPropsCopy = Object.assign({}, this.props);
+			const newPropsCopy = Object.assign({}, newProps);
+			delete thisPropsCopy['css'];
+			delete newPropsCopy['css'];
+
 			//check
 			shouldUpdateByEquality =
 				//either props has changed (ignoring css)
-				shouldComponentUpdate(this.props, this.state, newProps, newState) ||
+				shouldComponentUpdate(thisPropsCopy, this.state, newPropsCopy, newState) ||
 				//or css has changed
-				shouldComponentUpdate(thisPropsCss, null, newPropsCss, null);
-			//restore css on the props
-			this.props.css = thisPropsCss;
-			newProps.css = newPropsCss;
+				shouldComponentUpdate(this.props.css, null, newProps.css, null);
 		} else {
 			//we don't need to do anything with the props so just call shouldComponentUpdate
 			shouldUpdateByEquality = shouldComponentUpdate(this.props, this.state, newProps, newState);
