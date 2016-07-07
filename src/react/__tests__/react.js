@@ -91,9 +91,7 @@ describe('react', () => {
 			const css4 = {
 				test: 'bla'
 			};
-			@CSS(css, {
-				compare: true
-			})
+			@CSS(css)
 			@PURE
 			class Foo {
 				props = {

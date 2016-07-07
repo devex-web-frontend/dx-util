@@ -97,16 +97,13 @@ export function DISPOSABLE(target) {
 
 /**
  * @param {{}} cssModule
- * @param {TCSSDecoratorOptions} [options={}]
  * @returns {function(target: class):class}
  */
-export function CSS(cssModule, options = {}) {
+export function CSS(cssModule) {
 	return function(target) {
 		//noinspection JSDuplicatedDeclaration
 		const {componentWillMount, componentWillUpdate} = target.prototype;
-		if (options.compare) {
-			target.prototype[CHECK_FOR_CSS_EQUALITY] = true;
-		}
+		target.prototype[CHECK_FOR_CSS_EQUALITY] = true; //this is checked in @PURE
 		target.prototype.css = Object.assign({}, cssModule);
 		target.prototype.componentWillMount = function() {
 			if (this.props.css) {
