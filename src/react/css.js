@@ -36,7 +36,8 @@ export function CSS(cssModule = {}) {
 
 			//noinspection JSValidateTypes
 			if (checkContext(context, target)) {
-				//we are in original class and not called from child class in another context via call(this)
+				//we are called either as usual from react lifecycle
+				//or manually wuth custom context but we are in original target class
 				context.css = concatObjectValues(original, context.props.css);
 			}
 
