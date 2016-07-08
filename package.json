@@ -1,6 +1,6 @@
 {
   "name": "dx-util",
-  "version": "0.10.13",
+  "version": "0.10.14",
   "description": "Common utilities for dx-projects",
   "main": "./src/",
   "engines": {
