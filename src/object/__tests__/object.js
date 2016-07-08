@@ -1,7 +1,20 @@
 jest.disableAutomock();
-import {is, shallowEqual} from '../object';
+import {is, shallowEqual, mapKeys} from '../object';
 
 describe('object', () => {
+	describe('mapKeys', () => {
+		it('should return new object with keys mapped with template', () => {
+			const testObject = {
+				test: 'value',
+				test2: 'value2'
+			};
+			const newObject = mapKeys(testObject, key => `data-${key}`);
+
+			expect(newObject['data-test']).toEqual('value');
+			expect(newObject['data-test2']).toEqual('value2');
+		});
+	});
+
 	describe('is', () => {
 		it('should compare objects', () => {
 			expect(is(undefined, undefined)).toBeTruthy();
