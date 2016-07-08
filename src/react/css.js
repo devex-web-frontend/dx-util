@@ -35,7 +35,7 @@ export function CSS(cssModule = {}) {
 			const context = extractContext(this);
 
 			//noinspection JSValidateTypes
-			if (checkContext(context, target)) {
+			if (this !== CONTEXT) {
 				//we are called either as usual from react lifecycle
 				//or manually wuth custom context but we are in original target class
 				context.css = concatObjectValues(original, context.props.css);
@@ -57,7 +57,7 @@ export function CSS(cssModule = {}) {
 		function componentWillUpdate(newProps) {
 			const context = extractContext(this);
 			//noinspection JSValidateTypes
-			if (checkContext(context, target)) {
+			if (this !== CONTEXT) {
 				this.css = concatObjectValues(original, newProps.css);
 			}
 			if (oldComponentWillUpdate) {
@@ -73,7 +73,7 @@ export function CSS(cssModule = {}) {
 		function componentWillUnmount() {
 			const context = extractContext(this);
 			//noinspection JSValidateTypes
-			if (checkContext(context, target)) {
+			if (this !== CONTEXT) {
 				delete this['css'];
 			}
 			if (oldComponentWillUnmount) {
@@ -106,15 +106,6 @@ function concatObjectValues(object1, object2 = {}) {
 		}
 	});
 	return result;
-}
-
-/**
- * @param {*} context
- * @param {class} target
- * @returns {boolean}
- */
-function checkContext(context, target) {
-	return this !== CONTEXT || this === CONTEXT && context.constructor === target;
 }
 
 /**
