@@ -8,7 +8,9 @@ import {CSS_DECORATOR_STORAGE} from './__private__/css-pure-bridge';
 export function CSS(cssModule = {}) {
 	return function(target) {
 		//noinspection JSDuplicatedDeclaration
-		const {componentWillMount, componentWillUpdate, componentWillUnmount} = target.prototype;
+		const oldComponentWillMount = target.prototype.componentWillMount;
+		const oldComponentWillUpdate = target.prototype.componentWillUpdate;
+		const oldComponentWillUnmount = target.prototype.componentWillUnmount;
 
 		//get parent class css module
 		//prototype read is chained so we'll get parent's class css module
@@ -18,38 +20,56 @@ export function CSS(cssModule = {}) {
 		//prototype assignment is not chained - so we'll set only on current prototype
 		const original = target.prototype[CSS_DECORATOR_STORAGE] = concatObjectValues(parentCss, cssModule);
 
-		//inject react lifecycle methods to prototype
-		target.prototype.componentWillMount = function() {
-			//noinspection JSPotentiallyInvalidUsageOfThis
-			/**
-			 * @type {{}}
-			 */
-			this.css = concatObjectValues(original, this.props.css);
-			if (componentWillMount) {
-				componentWillMount.call(this);
+		//create functions in this closure
+
+		function componentWillMount() {
+			//we need to check if we are already in decorated componentWillUmount
+			//if so then we are called from child class it ITS CONTEXT (call(this))
+			//so we don't need to overwrite this.css with wrong (child's) context
+
+			if (oldComponentWillMount !== componentWillMount) {
+				//noinspection JSPotentiallyInvalidUsageOfThis
+				/**
+				 * @type {{}}
+				 */
+				this.css = concatObjectValues(original, this.props.css);
 			}
-		};
+
+			//call old function
+			if (oldComponentWillMount) {
+				oldComponentWillMount.call(this);
+			}
+		}
 
 		/**
 		 * @param {{}} newProps
 		 */
-		target.prototype.componentWillUpdate = function(newProps) {
-			//noinspection JSPotentiallyInvalidUsageOfThis
-			/**
-			 * @type {{}}
-			 */
-			this.css = concatObjectValues(original, newProps.css);
-			if (componentWillUpdate) {
-				componentWillUpdate.call(this, newProps);
+		function componentWillUpdate(newProps) {
+			if (oldComponentWillUpdate !== componentWillUpdate) {
+				//noinspection JSPotentiallyInvalidUsageOfThis
+				/**
+				 * @type {{}}
+				 */
+				this.css = concatObjectValues(original, newProps.css);
 			}
-		};
+			if (oldComponentWillUpdate) {
+				oldComponentWillUpdate.call(this, newProps);
+			}
+		}
 
-		target.prototype.componentWillUnmount = function() {
-			delete this['css'];
+		function componentWillUnmount() {
+			if (oldComponentWillUnmount !== componentWillUnmount) {
+				delete this['css'];
+			}
 			if (componentWillUnmount) {
 				componentWillUnmount.call(this);
 			}
-		};
+		}
+
+		//inject react lifecycle methods to prototype
+		target.prototype.componentWillMount = componentWillMount;
+		target.prototype.componentWillUpdate = componentWillUpdate;
+		target.prototype.componentWillUnmount = componentWillUnmount;
 	};
 }
 
