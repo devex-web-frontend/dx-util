@@ -38,16 +38,27 @@ export function style(el, styles) {
 }
 
 /**
+ * Get vendors property
+ * @param {String} property
+ * @returns {Array}
+ */
+export function getVendorProperty(property) {
+	const capitalizedProp = capitalize(property);
+	return ['wekbit', 'moz', 'ms', 'o'].map((prefix) => {
+		return `${prefix}${capitalizedProp}`;
+	});
+}
+
+/**
  * Assign style property to element with all possible vendor prefixes.
  * @param {HTMLElement} element
  * @param {String} property
  * @param {*} value
  */
 export function setVendorStyle(element, property, value) {
-	const capitalizedProp = capitalize(property);
 	element.style[property] = value;
-	['wekbit', 'moz', 'ms', 'o'].forEach((vendorPrefix) => {
-		element.style[`${vendorPrefix}${capitalizedProp}`] = value;
+	getVendorProperty(property).forEach((vendorProperty) => {
+		element.style[vendorProperty] = value;
 	});
 }
 
