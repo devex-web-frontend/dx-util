@@ -26,6 +26,9 @@ export function CSS(cssModule = {}) {
 
 		//create lifecycle methods
 
+		/**
+		 * componentWillMount
+		 */
 		function componentWillMount() {
 			//if this is CONTEXT then we are manually called from child's componentWillMount
 			//extract child's context as this.context
@@ -47,6 +50,7 @@ export function CSS(cssModule = {}) {
 		}
 
 		/**
+		 * componentWillUpdate
 		 * @param {{}} newProps
 		 */
 		function componentWillUpdate(newProps) {
@@ -62,6 +66,9 @@ export function CSS(cssModule = {}) {
 			}
 		}
 
+		/**
+		 * componentWillUnmount
+		 */
 		function componentWillUnmount() {
 			const context = extractContext(this);
 			//noinspection JSValidateTypes
@@ -100,6 +107,11 @@ function concatObjectValues(object1, object2 = {}) {
 	return result;
 }
 
+/**
+ * @param {*} context
+ * @param {class} target
+ * @returns {boolean}
+ */
 function checkContext(context, target) {
 	return this !== CONTEXT || this === CONTEXT && context.constructor === target;
 }

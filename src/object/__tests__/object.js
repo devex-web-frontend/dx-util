@@ -4,6 +4,7 @@ import {is, shallowEqual} from '../object';
 describe('object', () => {
 	describe('is', () => {
 		it('should compare objects', () => {
+			/*eslint-disable no-undefined*/
 			expect(is(undefined, undefined)).toBeTruthy();
 			expect(is(undefined, 1)).toBeFalsy();
 			expect(is(null, null)).toBeTruthy();
@@ -22,7 +23,7 @@ describe('object', () => {
 			expect(is(+0, +0)).toBeTruthy();
 			expect(is(-0, -0)).toBeTruthy();
 			expect(is(0, -0)).toBeFalsy();
-			expect(is(NaN, 0/0)).toBeTruthy();
+			expect(is(NaN, 0/0)).toBeTruthy(); //eslint-disable-line space-infix-ops
 		});
 	});
 });

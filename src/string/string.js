@@ -21,7 +21,9 @@ export function dasherize(string, lower = true) {
  */
 export function camelize(string, lower = true) {
 	//camelize
-	const camelized = string.replace(/[-_\s]+(.)?/g, (match, c) => c ? c.toUpperCase() : '');
+	const camelized = string.replace(/[-_\s]+(.)?/g, (match, c) => {
+		return c ? c.toUpperCase() : '';
+	});
 	if (lower) {
 		//decapitalize
 		return decapitalize(camelized);
@@ -43,7 +45,7 @@ let uniqueIdCounter = 0;
  * @returns {string}
  */
 export function randomId(prefix = '', postfix = '') {
-	let id = ++uniqueIdCounter;
+	const id = ++uniqueIdCounter;
 	return prefix + id + postfix;
 }
 
@@ -73,11 +75,11 @@ export function decapitalize(string) {
  */
 export function pluralize3(number, declensions) {
 	const cases = [2, 0, 1, 1, 1, 2];
-	number = Math.floor(Math.abs(number));
-	if (number % 100 > 4 && number % 100 < 20) {
+	const floored = Math.floor(Math.abs(number));
+	if (floored % 100 > 4 && floored % 100 < 20) {
 		return declensions[2];
-	} else if (number % 10 < 5) {
-		return declensions[cases[number % 10]];
+	} else if (floored % 10 < 5) {
+		return declensions[cases[floored % 10]];
 	} else {
 		return declensions[cases[5]];
 	}
@@ -90,9 +92,9 @@ export function pluralize3(number, declensions) {
  * @returns {String}
  */
 export function pluralize2(number, declensions) {
-	number = Math.floor(Math.abs(number));
+	const floored = Math.floor(Math.abs(number));
 
-	if (number % 10 === 1 && number !== 11) {
+	if (floored % 10 === 1 && floored !== 11) {
 		return declensions[0];
 	} else {
 		return declensions[1];

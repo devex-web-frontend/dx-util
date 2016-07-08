@@ -135,6 +135,9 @@ describe('Collection', () => {
 			readonly: true
 		}));
 
+		/**
+		 * @param {Collection} collection
+		 */
 		function check(collection) {
 			expect(collection.add.bind(null, 1)).toThrow();
 			expect(collection.remove.bind(null, 1)).toThrow();
