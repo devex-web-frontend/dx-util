@@ -1,5 +1,7 @@
 import {CSS_DECORATOR_STORAGE} from './__private__/shared';
 
+const CONTEXT = {};
+
 /**
  * CSS decorator
  * @param {{}} cssModule
@@ -25,15 +27,22 @@ export function CSS(cssModule = {}) {
 		//create lifecycle methods
 
 		function componentWillMount() {
+			//if this is CONTEXT then we are manually called from child's componentWillMount
+			//extract child's context as this.context
+			const context = extractContext(this);
+
 			//noinspection JSValidateTypes
-			if (this.constructor === target) {
+			if (checkContext(context, target)) {
 				//we are in original class and not called from child class in another context via call(this)
-				this.css = concatObjectValues(original, this.props.css);
+				context.css = concatObjectValues(original, context.props.css);
 			}
 
 			//call old version of function if exists
 			if (oldComponentWillMount) {
-				oldComponentWillMount.call(this);
+				//call in special context to differ from usual call
+				oldComponentWillMount.call(Object.assign(CONTEXT, {
+					context
+				}));
 			}
 		}
 
@@ -41,22 +50,28 @@ export function CSS(cssModule = {}) {
 		 * @param {{}} newProps
 		 */
 		function componentWillUpdate(newProps) {
+			const context = extractContext(this);
 			//noinspection JSValidateTypes
-			if (this.constructor === target) {
+			if (checkContext(context, target)) {
 				this.css = concatObjectValues(original, newProps.css);
 			}
 			if (oldComponentWillUpdate) {
-				oldComponentWillUpdate.call(this, newProps);
+				oldComponentWillUpdate.call(Object.assign(CONTEXT, {
+					context
+				}), newProps);
 			}
 		}
 
 		function componentWillUnmount() {
+			const context = extractContext(this);
 			//noinspection JSValidateTypes
-			if (this.constructor === target) {
+			if (checkContext(context, target)) {
 				delete this['css'];
 			}
 			if (oldComponentWillUnmount) {
-				oldComponentWillUnmount.call(this);
+				oldComponentWillUnmount.call(Object.assign(CONTEXT, {
+					context
+				}));
 			}
 		}
 
@@ -83,4 +98,16 @@ function concatObjectValues(object1, object2 = {}) {
 		}
 	});
 	return result;
+}
+
+function checkContext(context, target) {
+	return this !== CONTEXT || this === CONTEXT && context.constructor === target;
+}
+
+/**
+ * @param {*} context
+ * @returns {{}}
+ */
+function extractContext(context) {
+	return context === CONTEXT ? context.context : context;
 }
