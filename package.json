@@ -8,7 +8,7 @@
   },
   "scripts": {
     "postinstall": "bower install",
-    "test": "npm run eslint && npm run jest -- --coverage",
+    "test": "npm run eslint && npm run jest",
     "jest": "jest",
     "eslint": "eslint --config ./node_modules/eslint-config-dx/.eslintrc --ext .js ./src",
     "esdoc": "esdoc -c ./config/esdoc.js",
