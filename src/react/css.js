@@ -1,4 +1,4 @@
-import {CSS_DECORATOR_STORAGE} from './__private__/css-pure-bridge';
+import {CSS_DECORATOR_STORAGE} from './__private__/shared';
 
 /**
  * CSS decorator
@@ -7,9 +7,11 @@ import {CSS_DECORATOR_STORAGE} from './__private__/css-pure-bridge';
  */
 export function CSS(cssModule = {}) {
 	return function(target) {
-		//noinspection JSDuplicatedDeclaration
+		//noinspection JSUnresolvedVariable
 		const oldComponentWillMount = target.prototype.componentWillMount;
+		//noinspection JSUnresolvedVariable
 		const oldComponentWillUpdate = target.prototype.componentWillUpdate;
+		//noinspection JSUnresolvedVariable
 		const oldComponentWillUnmount = target.prototype.componentWillUnmount;
 
 		//get parent class css module
@@ -20,22 +22,16 @@ export function CSS(cssModule = {}) {
 		//prototype assignment is not chained - so we'll set only on current prototype
 		const original = target.prototype[CSS_DECORATOR_STORAGE] = concatObjectValues(parentCss, cssModule);
 
-		//create functions in this closure
+		//create lifecycle methods
 
 		function componentWillMount() {
-			//we need to check if we are already in decorated componentWillUmount
-			//if so then we are called from child class it ITS CONTEXT (call(this))
-			//so we don't need to overwrite this.css with wrong (child's) context
-
-			if (oldComponentWillMount !== componentWillMount) {
-				//noinspection JSPotentiallyInvalidUsageOfThis
-				/**
-				 * @type {{}}
-				 */
+			//noinspection JSValidateTypes
+			if (this.constructor === target) {
+				//we are in original class and not called from child class in another context via call(this)
 				this.css = concatObjectValues(original, this.props.css);
 			}
 
-			//call old function
+			//call old version of function if exists
 			if (oldComponentWillMount) {
 				oldComponentWillMount.call(this);
 			}
@@ -45,11 +41,8 @@ export function CSS(cssModule = {}) {
 		 * @param {{}} newProps
 		 */
 		function componentWillUpdate(newProps) {
-			if (oldComponentWillUpdate !== componentWillUpdate) {
-				//noinspection JSPotentiallyInvalidUsageOfThis
-				/**
-				 * @type {{}}
-				 */
+			//noinspection JSValidateTypes
+			if (this.constructor === target) {
 				this.css = concatObjectValues(original, newProps.css);
 			}
 			if (oldComponentWillUpdate) {
@@ -58,11 +51,12 @@ export function CSS(cssModule = {}) {
 		}
 
 		function componentWillUnmount() {
-			if (oldComponentWillUnmount !== componentWillUnmount) {
+			//noinspection JSValidateTypes
+			if (this.constructor === target) {
 				delete this['css'];
 			}
-			if (componentWillUnmount) {
-				componentWillUnmount.call(this);
+			if (oldComponentWillUnmount) {
+				oldComponentWillUnmount.call(this);
 			}
 		}
 
