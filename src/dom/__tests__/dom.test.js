@@ -61,10 +61,10 @@ describe('getVendorProperty', () => {
 		const vendorProperty = getVendorProperty('transform');
 		const [webkit, moz, ms, o] = vendorProperty;
 		
-		expect(webkit).toEqual('wekbitTransform');
-		expect(moz).toEqual('mozTransform');
+		expect(webkit).toEqual('WebKitTransform');
+		expect(moz).toEqual('MozTransform');
 		expect(ms).toEqual('msTransform');
-		expect(o).toEqual('oTransform');
+		expect(o).toEqual('OTransform');
 	});
 });
 
@@ -73,10 +73,10 @@ describe('setVendorStyle', () => {
 		const element = document.getElementById('element');
 		setVendorStyle(element, 'transform', 'testValue');
 
-		const {wekbitTransform, mozTransform, msTransform, oTransform} = element.style;
-		expect(wekbitTransform).toBeDefined();
-		expect(mozTransform).toBeDefined();
+		const {WebKitTransform, MozTransform, msTransform, OTransform} = element.style;
+		expect(WebKitTransform).toBeDefined();
+		expect(MozTransform).toBeDefined();
 		expect(msTransform).toBeDefined();
-		expect(oTransform).toBeDefined();
+		expect(OTransform).toBeDefined();
 	});
 });

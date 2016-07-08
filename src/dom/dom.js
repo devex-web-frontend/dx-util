@@ -44,7 +44,7 @@ export function style(el, styles) {
  */
 export function getVendorProperty(property) {
 	const capitalizedProp = capitalize(property);
-	return ['wekbit', 'moz', 'ms', 'o'].map((prefix) => {
+	return ['WebKit', 'Moz', 'ms', 'O'].map((prefix) => {
 		return `${prefix}${capitalizedProp}`;
 	});
 }
