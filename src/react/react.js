@@ -5,7 +5,7 @@ import {DISPOSABLE as fdisposable} from '../function/disposable';
  * Indicates that css object should be checked for equality in {@link PURE} components
  * @type {Symbol}
  */
-const CHECK_FOR_CSS_EQUALITY = Symbol('_CHECK_FOR_CSS_EQUALITY_');
+const CSS_DECORATOR_STORAGE = Symbol('_CHECK_FOR_CSS_EQUALITY_');
 
 /**
  * Pure render checker
@@ -39,7 +39,7 @@ export function PURE(target) {
 			oldShouldComponentUpdate.call(this, newProps, newState);
 
 		//check props.css if decorated with @CSS and should compare
-		const shouldCheckCSS = !!target.prototype[CHECK_FOR_CSS_EQUALITY];
+		const shouldCheckCSS = !!target.prototype[CSS_DECORATOR_STORAGE];
 
 		//check shallow equality
 		//will be set further basing on shouldCheckCss
@@ -89,36 +89,53 @@ export function DISPOSABLE(target) {
 }
 
 /**
- * @typedef {Object} TCSSDecoratorOptions
- * @property {boolean} [compare] - Check props.css equality in {@link PURE} components
- */
-
-/**
+ * CSS decorator
  * @param {{}} cssModule
  * @returns {function(target: class):class}
  */
-export function CSS(cssModule) {
+export function CSS(cssModule = {}) {
 	return function(target) {
 		//noinspection JSDuplicatedDeclaration
-		const {componentWillMount, componentWillUpdate} = target.prototype;
-		target.prototype[CHECK_FOR_CSS_EQUALITY] = true; //this is checked in @PURE
-		target.prototype.css = Object.assign({}, cssModule);
-		target.prototype.componentWillMount = function() {
-			if (this.props.css) {
-				this.css = concatObjectValues(cssModule, this.props.css);
-			}
+		const {componentWillMount, componentWillUpdate, componentWillUnmount} = target.prototype;
 
+		//get parent class css module
+		//prototype read is chained so we'll get parent's class css module
+		const parentCss = target.prototype[CSS_DECORATOR_STORAGE];
+
+		//mix parent with current css module and set on current prototype
+		//prototype assignment is not chained - so we'll set only on current prototype
+		const original = target.prototype[CSS_DECORATOR_STORAGE] = concatObjectValues(parentCss, cssModule);
+
+		//inject react lifecycle methods to prototype
+		target.prototype.componentWillMount = function() {
+			//noinspection JSPotentiallyInvalidUsageOfThis
+			/**
+			 * @type {{}}
+			 */
+			this.css = concatObjectValues(original, this.props.css);
 			if (componentWillMount) {
 				componentWillMount();
 			}
 		};
-		target.prototype.componentWillUpdate = function(nextProps) {
-			if (this.props.css !== nextProps.css) {
-				this.css = concatObjectValues(cssModule, nextProps.css);
-			}
 
+		/**
+		 * @param {{}} newProps
+		 */
+		target.prototype.componentWillUpdate = function(newProps) {
+			//noinspection JSPotentiallyInvalidUsageOfThis
+			/**
+			 * @type {{}}
+			 */
+			this.css = concatObjectValues(original, newProps.css);
 			if (componentWillUpdate) {
-				componentWillUpdate();
+				componentWillUpdate(newProps);
+			}
+		};
+
+		target.prototype.componentWillUnmount = function() {
+			delete this['css'];
+			if (componentWillUnmount) {
+				componentWillUnmount();
 			}
 		};
 	};
@@ -133,7 +150,11 @@ export function CSS(cssModule) {
 function concatObjectValues(object1, object2 = {}) {
 	const result = Object.assign({}, object1);
 	Object.keys(object2).forEach(key => {
-		result[key] = `${result[key] || ''} ${object2[key]}`;
+		if (result[key]) {
+			result[key] = `${result[key] || ''} ${object2[key]}`;
+		} else {
+			result[key] = object2[key];
+		}
 	});
 	return result;
 }
