@@ -114,7 +114,7 @@ export function CSS(cssModule = {}) {
 			 */
 			this.css = concatObjectValues(original, this.props.css);
 			if (componentWillMount) {
-				componentWillMount();
+				componentWillMount.call(this);
 			}
 		};
 
@@ -128,14 +128,14 @@ export function CSS(cssModule = {}) {
 			 */
 			this.css = concatObjectValues(original, newProps.css);
 			if (componentWillUpdate) {
-				componentWillUpdate(newProps);
+				componentWillUpdate.call(this, newProps);
 			}
 		};
 
 		target.prototype.componentWillUnmount = function() {
 			delete this['css'];
 			if (componentWillUnmount) {
-				componentWillUnmount();
+				componentWillUnmount.call(this);
 			}
 		};
 	};
