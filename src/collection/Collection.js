@@ -49,6 +49,14 @@ export default class Collection extends Emitter {
 	}
 
 	/**
+	 * Items copy
+	 * @returns {Array.<TCollectionItem>}
+	 */
+	get items() {
+		return this._items.slice();
+	}
+
+	/**
 	 * @param {Array<TCollectionItem>} [items=[]]
 	 * @param {TCollectionOptions} [options={}]
 	 */
@@ -155,6 +163,18 @@ export default class Collection extends Emitter {
 	map(callback) {
 		//do not pass callback directly to not give access to items arrays as 3rd argument
 		return this._items.map((element, index) => callback(element, index));
+	}
+
+	/**
+	 * Reduces collection with callback and initial value
+	 * @param {function(acc:T, element:TCollectionItem, index:number):T} callback
+	 * @param {T} initial
+	 * @returns {T}
+	 * @template {T,TCollectionItem}
+	 */
+	reduce(callback, initial) {
+		//do not pass callback directly to not give access to items arrays as 3rd argument
+		return this._items.reduce((acc, element, index) => callback(acc, element, index), initial);
 	}
 
 	/**

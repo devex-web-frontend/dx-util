@@ -127,7 +127,7 @@ function normalizeArrayModifiers(modifiers) {
 /**
  * Checks if modifiers is an object with boolean values for classname keys
  * @param {TBemModifiers} modifiers
- * @return {boolean}
+ * @returns {boolean}
  */
 function isKeyModifiers(modifiers) {
 	return !isArrayModifiers(modifiers) && !!modifiers && typeof modifiers === 'object';

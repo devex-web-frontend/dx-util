@@ -73,6 +73,14 @@ describe('Collection', () => {
 		expect(collection.length).toBe(1);
 	});
 
+	it('should prove items getter and return a copy', () => {
+		collection.clear();
+		collection.add(1);
+		const items = collection.items;
+		collection.add(2);
+		expect(items).toEqual([1]);
+	});
+
 	it('should find and throw', () => {
 		expect(collection.find(item => item === 1)).toBe(1);
 		expect(collection.find.bind(null, item => item === 4)).toThrow();
@@ -93,6 +101,14 @@ describe('Collection', () => {
 
 	it('should map', () => {
 		expect(collection.map(item => item * item)).toEqual([1, 4, 9]);
+	});
+
+	it('should reduce', () => {
+		expect(collection.reduce((acc, item, i) => {
+			acc.push(0);
+			acc.push(item);
+			return acc;
+		}, [])).toEqual([0, 1, 0, 2, 0, 3]);
 	});
 
 	it('should some', () => {
@@ -119,6 +135,9 @@ describe('Collection', () => {
 			readonly: true
 		}));
 
+		/**
+		 * @param {Collection} collection
+		 */
 		function check(collection) {
 			expect(collection.add.bind(null, 1)).toThrow();
 			expect(collection.remove.bind(null, 1)).toThrow();

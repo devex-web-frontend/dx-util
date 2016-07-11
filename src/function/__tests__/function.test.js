@@ -1,10 +1,9 @@
-jest.unmock('../debounce.js');
-jest.unmock('../throttle.js');
-jest.unmock('../memoize.js');
+jest.disableAutomock();
 
 import debounce, {DEBOUNCE} from '../debounce';
 import throttle, {THROTTLE} from '../throttle';
 import memoize, {MEMOIZE} from '../memoize';
+import {DISPOSABLE} from '../disposable';
 
 describe('function', () => {
 	describe('debounce', () => {
@@ -42,6 +41,22 @@ describe('function', () => {
 			decorated.debounced(2);
 			expect(callback.mock.calls.length).toBe(1);
 		});
+
+		it('should decorate properties', () => {
+			const callback = jest.fn();
+			const foo = new class {
+				@DEBOUNCE(100)
+				bar = () => {
+					callback();
+				}
+			};
+			foo.bar();
+			expect(callback).not.toBeCalled();
+			jest.runAllTimers();
+			expect(callback).toBeCalled();
+			foo.bar();
+			expect(callback.mock.calls.length).toBe(1);
+		});
 	});
 
 	describe('throttle', () => {
@@ -57,6 +72,26 @@ describe('function', () => {
 
 			jest.runAllTimers();
 			throttled();
+			expect(callback.mock.calls.length).toBe(2);
+		});
+
+		it('should decorate properties', () => {
+			const callback = jest.fn();
+			const foo = new class {
+				@THROTTLE(100)
+				bar = () => {
+					callback();
+				}
+			};
+
+			foo.bar();
+			expect(callback).toBeCalled();
+
+			foo.bar();
+			expect(callback.mock.calls.length).toBe(1);
+
+			jest.runAllTimers();
+			foo.bar();
 			expect(callback.mock.calls.length).toBe(2);
 		});
 	});
@@ -96,7 +131,7 @@ describe('function', () => {
 		});
 
 		it('should throw on invalid arguments', () => {
-			const fn = memoize(function() {
+			const fn = memoize(function() { //eslint-disable-line no-empty-function
 			});
 			expect(fn.bind(null, [])).toThrow();
 			expect(fn.bind(null, {})).toThrow();
@@ -132,6 +167,20 @@ describe('function', () => {
 			expect(callback.mock.calls.length).toBe(1);
 		});
 
+		it('should decorate properties', () => {
+			const callback = jest.fn();
+			const foo = new class {
+				@MEMOIZE
+				bar = (a, b) => {
+					callback();
+					return a + b;
+				}
+			};
+			expect(foo.bar('1', '2')).toBe('12');
+			expect(foo.bar('1', '2')).toBe('12');
+			expect(callback.mock.calls.length).toBe(1);
+		});
+
 		it('should support static fields', () => {
 			const callback = jest.fn();
 			class Foo {
@@ -152,6 +201,29 @@ describe('function', () => {
 			expect(Foo.bar).toBe(1);
 			expect(Foo.bar).toBe(1);
 			expect(callback.mock.calls.length).toBe(2);
+		});
+	});
+
+	describe('DISPOSABLE', () => {
+		it('should decorate class', () => {
+			//
+			@DISPOSABLE
+			class Foo {
+			}
+			expect(Foo.prototype._using).toBeDefined();
+			expect(Foo.prototype.dispose).toBeDefined();
+		});
+		it('should implement disposing', () => {
+			const callback = jest.fn();
+			@DISPOSABLE
+			class Foo {
+				constructor() {
+					this._using([callback]);
+				}
+			}
+			const foo = new Foo();
+			foo.dispose();
+			expect(callback).toBeCalled();
 		});
 	});
 });

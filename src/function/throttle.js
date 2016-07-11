@@ -21,7 +21,7 @@ export default function throttle(func, wait = 0, options = {}) {
 	let timeout = null;
 	let previous = 0;
 
-	let later = () => {
+	const later = () => {
 		previous = options.leading === false ? 0 : Date.now();
 		timeout = null;
 		result = func.apply(context, args);
@@ -32,13 +32,13 @@ export default function throttle(func, wait = 0, options = {}) {
 	};
 
 	return function() {
-		let now = Date.now();
+		const now = Date.now();
 		if (!previous && options.leading === false) {
 			previous = now;
 		}
 
-		let remaining = wait - (now - previous);
-		context = this;
+		const remaining = wait - (now - previous);
+		context = this; //eslint-disable-line consistent-this
 		args = arguments;
 		if (remaining <= 0 || remaining > wait) {
 			if (timeout) {
@@ -56,7 +56,7 @@ export default function throttle(func, wait = 0, options = {}) {
 		}
 		return result;
 	};
-};
+}
 
 /**
  * Class method decorator for {@link throttle}.
@@ -66,7 +66,16 @@ export default function throttle(func, wait = 0, options = {}) {
  */
 export function THROTTLE(wait = 0, options = {}) {
 	return function(target, prop, descriptor) {
-		descriptor.value = throttle(descriptor.value, wait, options);
+		if (descriptor.initializer) {
+			const old = descriptor.initializer;
+			descriptor.initializer = function initializer() {
+				return throttle(old.call(this), wait, options);
+			};
+		} else if (descriptor.get) {
+			descriptor.get = throttle(descriptor.get, wait, options);
+		} else if (descriptor.value) {
+			descriptor.value = throttle(descriptor.value, wait, options);
+		}
 		return descriptor;
 	};
 }

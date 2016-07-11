@@ -14,8 +14,8 @@ export default function debounce(func, wait = 0, immediate = false) {
 	let timestamp;
 	let result;
 
-	let later = () => {
-		let last = Date.now() - timestamp;
+	const later = () => {
+		const last = Date.now() - timestamp;
 
 		if (last < wait && last >= 0) {
 			timeout = setTimeout(later, wait - last);
@@ -32,10 +32,10 @@ export default function debounce(func, wait = 0, immediate = false) {
 	};
 
 	return function() {
-		context = this;
+		context = this; //eslint-disable-line consistent-this
 		args = arguments;
 		timestamp = Date.now();
-		let callNow = immediate && !timeout;
+		const callNow = immediate && !timeout;
 
 		if (!timeout) {
 			timeout = setTimeout(later, wait);
@@ -48,7 +48,7 @@ export default function debounce(func, wait = 0, immediate = false) {
 
 		return result;
 	};
-};
+}
 
 /**
  * Class method decorator for {@link debounce}.
@@ -59,7 +59,16 @@ export default function debounce(func, wait = 0, immediate = false) {
  */
 export function DEBOUNCE(wait = 0, immediate = false) {
 	return function(target, prop, descriptor) {
-		descriptor.value = debounce(descriptor.value, wait, immediate);
+		if (descriptor.initializer) {
+			const old = descriptor.initializer;
+			descriptor.initializer = function initializer() {
+				return debounce(old.call(this), wait, immediate);
+			};
+		} else if (descriptor.get) {
+			descriptor.get = debounce(descriptor.get, wait, immediate);
+		} else if (descriptor.value) {
+			descriptor.value = debounce(descriptor.value, wait, immediate);
+		}
 		return descriptor;
 	};
 }
