@@ -1,4 +1,10 @@
-import {CSS_DECORATOR_STORAGE, CSS_DECORATOR_OVERRIDE_MARKER} from './__private__/shared';
+import {CSS_DECORATOR_STORAGE} from './__private__/shared';
+
+/**
+ * Indicates that lifecycle method is overridden by {@link @CSS} decorator
+ * @type {Symbol}
+ */
+const CSS_DECORATOR_OVERRIDE_MARKER = Symbol('CSS_DECORATOR_OVERRIDE_MARKER');
 
 const CONTEXT = {};
 
