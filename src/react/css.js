@@ -1,4 +1,4 @@
-import {CSS_DECORATOR_STORAGE} from './__private__/shared';
+import {CSS_DECORATOR_STORAGE, CSS_DECORATOR_OVERRIDE_MARKER} from './__private__/shared';
 
 const CONTEXT = {};
 
@@ -43,12 +43,12 @@ export function CSS(cssModule = {}) {
 
 			//call old version of function if exists
 			if (oldComponentWillMount) {
-				//call in special context to differ from usual call
-				oldComponentWillMount.call(Object.assign(CONTEXT, {
-					context
-				}));
+				oldComponentWillMount.call(composeContext(oldComponentWillMount, context));
 			}
 		}
+
+		//mark method as overridden to check it further before composing context to call original method
+		overrideMethod(componentWillMount);
 
 		/**
 		 * componentWillUpdate
@@ -61,11 +61,11 @@ export function CSS(cssModule = {}) {
 				this.css = concatObjectValues(original, newProps.css);
 			}
 			if (oldComponentWillUpdate) {
-				oldComponentWillUpdate.call(Object.assign(CONTEXT, {
-					context
-				}), newProps);
+				oldComponentWillUpdate.call(composeContext(oldComponentWillUpdate, context), newProps);
 			}
 		}
+
+		overrideMethod(componentWillUpdate);
 
 		/**
 		 * componentWillUnmount
@@ -77,11 +77,11 @@ export function CSS(cssModule = {}) {
 				delete this['css'];
 			}
 			if (oldComponentWillUnmount) {
-				oldComponentWillUnmount.call(Object.assign(CONTEXT, {
-					context
-				}));
+				oldComponentWillUnmount.call(composeContext(oldComponentWillUnmount, context));
 			}
 		}
+
+		overrideMethod(componentWillUnmount);
 
 		//inject react lifecycle methods to prototype
 		target.prototype.componentWillMount = componentWillMount;
@@ -114,4 +114,27 @@ function concatObjectValues(object1, object2 = {}) {
  */
 function extractContext(context) {
 	return context === CONTEXT ? context.context : context;
+}
+
+/**
+ * @param {Function} method
+ * @param {*} context
+ * @returns {{}}
+ */
+function composeContext(method, context) {
+	//we need to detect if old method is overridden to work with custom context
+	if (method[CSS_DECORATOR_OVERRIDE_MARKER]) {
+		//call in special context to differ from usual call
+		return Object.assign(CONTEXT, {
+			context
+		});
+	}
+	return context;
+}
+
+/**
+ * @param {Function} method
+ */
+function overrideMethod(method) {
+	method[CSS_DECORATOR_OVERRIDE_MARKER] = true;
 }
