@@ -131,7 +131,7 @@ describe('function', () => {
 		});
 
 		it('should throw on invalid arguments', () => {
-			const fn = memoize(function() {
+			const fn = memoize(function() { //eslint-disable-line no-empty-function
 			});
 			expect(fn.bind(null, [])).toThrow();
 			expect(fn.bind(null, {})).toThrow();

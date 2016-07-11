@@ -2,6 +2,8 @@ jest.unmock('../bem.js');
 
 import {default as bem, block, element, modifier, BEM} from '../bem';
 
+/*eslint-disable object-curly-newline,object-property-newline,no-undefined*/
+
 describe('bem', () => {
 	describe('block', () => {
 		it('should generate block className', () => {

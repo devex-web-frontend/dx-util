@@ -1,6 +1,14 @@
 import {CSS_DECORATOR_STORAGE} from './__private__/shared';
 
 /**
+ * Indicates that lifecycle method is overridden by {@link @CSS} decorator
+ * @type {Symbol}
+ */
+const CSS_DECORATOR_OVERRIDE_MARKER = Symbol('CSS_DECORATOR_OVERRIDE_MARKER');
+
+const CONTEXT = {};
+
+/**
  * CSS decorator
  * @param {{}} cssModule
  * @returns {function(target: class):class}
@@ -24,41 +32,62 @@ export function CSS(cssModule = {}) {
 
 		//create lifecycle methods
 
+		/**
+		 * componentWillMount
+		 */
 		function componentWillMount() {
+			//if this is CONTEXT then we are manually called from child's componentWillMount
+			//extract child's context as this.context
+			const context = extractContext(this);
+
 			//noinspection JSValidateTypes
-			if (this.constructor === target) {
-				//we are in original class and not called from child class in another context via call(this)
-				this.css = concatObjectValues(original, this.props.css);
+			if (this !== CONTEXT) {
+				//we are called either as usual from react lifecycle
+				//or manually wuth custom context but we are in original target class
+				context.css = concatObjectValues(original, context.props.css);
 			}
 
 			//call old version of function if exists
 			if (oldComponentWillMount) {
-				oldComponentWillMount.call(this);
+				oldComponentWillMount.call(composeContext(oldComponentWillMount, context));
 			}
 		}
 
+		//mark method as overridden to check it further before composing context to call original method
+		overrideMethod(componentWillMount);
+
 		/**
+		 * componentWillUpdate
 		 * @param {{}} newProps
 		 */
 		function componentWillUpdate(newProps) {
+			const context = extractContext(this);
 			//noinspection JSValidateTypes
-			if (this.constructor === target) {
+			if (this !== CONTEXT) {
 				this.css = concatObjectValues(original, newProps.css);
 			}
 			if (oldComponentWillUpdate) {
-				oldComponentWillUpdate.call(this, newProps);
+				oldComponentWillUpdate.call(composeContext(oldComponentWillUpdate, context), newProps);
 			}
 		}
 
+		overrideMethod(componentWillUpdate);
+
+		/**
+		 * componentWillUnmount
+		 */
 		function componentWillUnmount() {
+			const context = extractContext(this);
 			//noinspection JSValidateTypes
-			if (this.constructor === target) {
+			if (this !== CONTEXT) {
 				delete this['css'];
 			}
 			if (oldComponentWillUnmount) {
-				oldComponentWillUnmount.call(this);
+				oldComponentWillUnmount.call(composeContext(oldComponentWillUnmount, context));
 			}
 		}
+
+		overrideMethod(componentWillUnmount);
 
 		//inject react lifecycle methods to prototype
 		target.prototype.componentWillMount = componentWillMount;
@@ -83,4 +112,35 @@ function concatObjectValues(object1, object2 = {}) {
 		}
 	});
 	return result;
+}
+
+/**
+ * @param {*} context
+ * @returns {{}}
+ */
+function extractContext(context) {
+	return context === CONTEXT ? context.context : context;
+}
+
+/**
+ * @param {Function} method
+ * @param {*} context
+ * @returns {{}}
+ */
+function composeContext(method, context) {
+	//we need to detect if old method is overridden to work with custom context
+	if (method[CSS_DECORATOR_OVERRIDE_MARKER]) {
+		//call in special context to differ from usual call
+		return Object.assign(CONTEXT, {
+			context
+		});
+	}
+	return context;
+}
+
+/**
+ * @param {Function} method
+ */
+function overrideMethod(method) {
+	method[CSS_DECORATOR_OVERRIDE_MARKER] = true;
 }
