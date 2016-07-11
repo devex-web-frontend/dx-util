@@ -1,15 +1,15 @@
 jest.unmock('../dom.js');
 jest.unmock('../../string/string.js');
 
-import  {
+import {
 	getBoundingClientRect,
 	style,
 	getVendorProperty,
 	setVendorStyle
 } from '../dom.js';
 
-beforeEach(() =>{
-	document.body.innerHTML = `<div id="element"></div>`;
+beforeEach(() => {
+	document.body.innerHTML = '<div id="element"></div>';
 });
 
 describe('getBoundingClientRect', () => {
