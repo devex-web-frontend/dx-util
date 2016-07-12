@@ -1,6 +1,6 @@
 import {shallowEqual} from '../object/object';
 
-import {CSS_DECORATOR_STORAGE} from './__private__/css-pure-bridge';
+import {CSS_DECORATOR_STORAGE} from './__private__/shared';
 
 /**
  * Pure render checker

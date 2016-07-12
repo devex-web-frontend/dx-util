@@ -209,7 +209,7 @@ describe('react', () => {
 			expect(componentWillUnmount).toBeCalled();
 		});
 
-		fdescribe('inheritance', () => {
+		describe('inheritance', () => {
 			const fooCss = {
 				foo: 'foo'
 			};

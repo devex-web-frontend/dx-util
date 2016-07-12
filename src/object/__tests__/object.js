@@ -1,9 +1,23 @@
 jest.disableAutomock();
-import {is, shallowEqual} from '../object';
+import {is, shallowEqual, mapKeys} from '../object';
 
 describe('object', () => {
+	describe('mapKeys', () => {
+		it('should return new object with keys mapped with template', () => {
+			const testObject = {
+				test: 'value',
+				test2: 'value2'
+			};
+			const newObject = mapKeys(testObject, key => `data-${key}`);
+
+			expect(newObject['data-test']).toEqual('value');
+			expect(newObject['data-test2']).toEqual('value2');
+		});
+	});
+
 	describe('is', () => {
 		it('should compare objects', () => {
+			/*eslint-disable no-undefined*/
 			expect(is(undefined, undefined)).toBeTruthy();
 			expect(is(undefined, 1)).toBeFalsy();
 			expect(is(null, null)).toBeTruthy();
@@ -22,7 +36,7 @@ describe('object', () => {
 			expect(is(+0, +0)).toBeTruthy();
 			expect(is(-0, -0)).toBeTruthy();
 			expect(is(0, -0)).toBeFalsy();
-			expect(is(NaN, 0/0)).toBeTruthy();
+			expect(is(NaN, 0/0)).toBeTruthy(); //eslint-disable-line space-infix-ops
 		});
 	});
 });

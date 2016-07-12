@@ -14,8 +14,8 @@ export default function debounce(func, wait = 0, immediate = false) {
 	let timestamp;
 	let result;
 
-	let later = () => {
-		let last = Date.now() - timestamp;
+	const later = () => {
+		const last = Date.now() - timestamp;
 
 		if (last < wait && last >= 0) {
 			timeout = setTimeout(later, wait - last);
@@ -32,10 +32,10 @@ export default function debounce(func, wait = 0, immediate = false) {
 	};
 
 	return function() {
-		context = this;
+		context = this; //eslint-disable-line consistent-this
 		args = arguments;
 		timestamp = Date.now();
-		let callNow = immediate && !timeout;
+		const callNow = immediate && !timeout;
 
 		if (!timeout) {
 			timeout = setTimeout(later, wait);
@@ -48,7 +48,7 @@ export default function debounce(func, wait = 0, immediate = false) {
 
 		return result;
 	};
-};
+}
 
 /**
  * Class method decorator for {@link debounce}.

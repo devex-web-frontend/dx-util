@@ -1,6 +1,6 @@
 {
   "name": "dx-util",
-  "version": "0.10.16",
+  "version": "0.10.17",
   "description": "Common utilities for dx-projects",
   "main": "./src/",
   "engines": {
@@ -10,7 +10,7 @@
     "postinstall": "bower install",
     "test": "npm run eslint && npm run jest",
     "jest": "jest",
-    "eslint": "eslint --config ./node_modules/eslint-config-dx/.eslintrc --ext .js ./src",
+    "eslint": "eslint --config ./node_modules/dx-lint/.eslintrc --ext .js ./src",
     "esdoc": "esdoc -c ./config/esdoc.js",
     "start": "jest --watch",
     "bower": "bower",
@@ -30,17 +30,18 @@
     "scriptPreprocessor": "<rootDir>/node_modules/babel-jest"
   },
   "devDependencies": {
-    "babel-eslint": "^6.0.4",
+    "babel-eslint": "^6.1.0",
     "babel-jest": "12.0.2",
     "babel-plugin-transform-class-properties": "^6.8.0",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-preset-es2015": "^6.6.0",
     "bower": "^1.7.9",
     "dx-flow": "github:devex-web-frontend/dx-flow",
+    "dx-lint": "github:devex-web-frontend/dx-lint",
     "esdoc": "^0.4.7",
     "esdoc-es7-plugin": "0.0.3",
-    "eslint": "^1.10.1",
-    "eslint-config-dx": "github:devex-web-frontend/eslint-config-dx",
+    "eslint": "^2.13.1",
+    "eslint-plugin-babel": "^3.3.0",
     "jest-cli": "12.0.2"
   }
 }
