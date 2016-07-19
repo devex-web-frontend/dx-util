@@ -33,26 +33,29 @@ export function PURE(target) {
 			!oldShouldComponentUpdate ||
 			oldShouldComponentUpdate.call(this, newProps, newState);
 
+		//check props.theme which can be set by react-css-themr
+		const shouldCheckTheme = !!newProps.theme;
+
 		//check props.css if decorated with @CSS and should compare
-		const shouldCheckCSS = !!target.prototype[CSS_DECORATOR_STORAGE];
+		// const shouldCheckCSS = !!target.prototype[CSS_DECORATOR_STORAGE];
 
 		//check shallow equality
 		//will be set further basing on shouldCheckCss
 		let shouldUpdateByEquality;
 
-		if (shouldCheckCSS) {
-			//now we need to remove css object from original props to avoid checking by shouldComponentUpdate
+		if (shouldCheckTheme) {
+			//now we need to remove theme object from original props to avoid checking by shouldComponentUpdate
 			const thisPropsCopy = Object.assign({}, this.props);
 			const newPropsCopy = Object.assign({}, newProps);
-			delete thisPropsCopy['css'];
-			delete newPropsCopy['css'];
+			delete thisPropsCopy['theme'];
+			delete newPropsCopy['theme'];
 
 			//check
 			shouldUpdateByEquality =
 				//either props has changed (ignoring css)
 				shouldComponentUpdate(thisPropsCopy, this.state, newPropsCopy, newState) ||
-				//or css has changed
-				shouldComponentUpdate(this.props.css, null, newProps.css, null);
+				//or theme has changed
+				shouldComponentUpdate(this.props.theme, null, newProps.theme, null);
 		} else {
 			//we don't need to do anything with the props so just call shouldComponentUpdate
 			shouldUpdateByEquality = shouldComponentUpdate(this.props, this.state, newProps, newState);

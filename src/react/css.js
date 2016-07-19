@@ -14,6 +14,7 @@ const CONTEXT = {};
  * @returns {function(target: class):class}
  */
 export function CSS(cssModule = {}) {
+	console.warn('CSS decorator is deprecated. Use react-css-themr');
 	return function(target) {
 		//noinspection JSUnresolvedVariable
 		const oldComponentWillMount = target.prototype.componentWillMount;
