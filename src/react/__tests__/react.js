@@ -78,7 +78,7 @@ describe('react', () => {
 				a: 2 //value is different
 			})).toBeFalsy(); //but base shouldComponentUpdate returns false
 		});
-		it('should check css object for equality when using with @CSS', () => {
+		it('should check props.theme object for equality when using with react-css-themr', () => {
 			const css = {
 				container: 'container'
 			};
@@ -91,22 +91,21 @@ describe('react', () => {
 			const css4 = {
 				test: 'bla'
 			};
-			@CSS(css)
 			@PURE
 			class Foo {
 				props = {
-					css: css2 //this.css is a mix of css and css2
+					theme: css2
 				}
 			}
 			const foo = new Foo();
 			expect(foo.shouldComponentUpdate({ //same css
-				css: css2
+				theme: css2
 			})).toBeFalsy();
 			expect(foo.shouldComponentUpdate({ //different css but with same structure
-				css: css3
+				theme: css3
 			})).toBeFalsy();
 			expect(foo.shouldComponentUpdate({ //different css
-				css: css4
+				theme: css4
 			})).toBeTruthy();
 		});
 	});
@@ -152,169 +151,5 @@ describe('react', () => {
 			expect(callback).toBeCalled();
 			expect(componentWillUnmount).toBeCalled();
 		});
-	});
-
-	describe('CSS decorator', () => {
-		const css = {
-			test: 'original'
-		};
-		const componentWillMount = jest.fn();
-		const componentWillUpdate = jest.fn();
-		const componentWillUnmount = jest.fn();
-		@CSS(css)
-		class Foo {
-			componentWillMount() {
-				componentWillMount();
-			}
-
-			componentWillUpdate(newProps) {
-				componentWillUpdate(newProps);
-			}
-
-			componentWillUnmount() {
-				componentWillUnmount();
-			}
-		}
-		const foo = new Foo();
-		it('should inject this.css mixed from original css and props.css', () => {
-			foo.props = {
-				css: {
-					test: 'test2'
-				}
-			};
-			foo.componentWillMount();
-			expect(foo.css).toEqual({
-				test: 'original test2'
-			});
-			expect(componentWillMount).toBeCalled();
-		});
-
-		it('should mix original css and props.css on update', () => {
-			const newProps = {
-				css: {
-					test3: '111'
-				}
-			};
-			foo.componentWillUpdate(newProps);
-			expect(foo.css).toEqual({
-				test: 'original',
-				test3: '111'
-			});
-			expect(componentWillUpdate).toBeCalledWith(newProps);
-		});
-
-		it('should remove link to css storage on unmount', () => {
-			foo.componentWillUnmount();
-			expect(foo.css).not.toBeDefined();
-			expect(componentWillUnmount).toBeCalled();
-		});
-
-		describe('inheritance', () => {
-			const fooCss = {
-				foo: 'foo'
-			};
-			@CSS(fooCss)
-			class Foo2 {
-
-			}
-			const barCss = {
-				bar: 'bar'
-			};
-			@CSS(barCss)
-			class Bar extends Foo2 {
-				props = {
-					css: {
-						p: 'p'
-					}
-				}
-
-				//to preserve context
-				componentWillMount() {
-				}
-
-				componentWillUpdate(newProps) {
-
-				}
-			}
-			it('should mix both child and parent css modules and props.css', () => {
-				const bar = new Bar();
-				bar.componentWillMount();
-				expect(bar.css).toEqual({
-					foo: 'foo',
-					bar: 'bar',
-					p: 'p'
-				});
-			});
-
-			it('should mix both child and parent css modules and props.css on update', () => {
-				const bar = new Bar();
-				bar.componentWillUpdate({
-					css: {
-						fff: 'fff'
-					}
-				});
-				expect(bar.css).toEqual({
-					foo: 'foo',
-					bar: 'bar',
-					fff: 'fff'
-				});
-			});
-
-			it('should inject only to current class prototype and ignore parent', () => {
-				const foo = new Foo2();
-				const bar = new Bar();
-				foo.componentWillUpdate({
-					css: {
-						ddd: 'ddd'
-					}
-				});
-				bar.componentWillUpdate({
-					css: {
-						fff: 'fff'
-					}
-				});
-				expect(foo.css).toEqual({
-					foo: 'foo',
-					ddd: 'ddd'
-				});
-				expect(bar.css).toEqual({
-					foo: 'foo',
-					bar: 'bar',
-					fff: 'fff'
-				});
-			});
-		});
-		// it('should inject css names from props on mount and on recieve props', () => {
-		// 	const newCss = {
-		// 		test: 'test'
-		// 	};
-		// 	foo.props = {
-		// 		css: newCss
-		// 	};
-		// 	foo.componentWillMount();
-		// 	expect(Foo.prototype.css).toEqual(css); //prototype is still clean
-		// 	expect(foo.css).toEqual({
-		// 		container: 'container',
-		// 		test: 'original test'
-		// 	}); //instance is merged
-		// 	expect(componentWillMount).toBeCalled(); //old componentWillMount is also called
-		// 	const newCss2 = {
-		// 		test: 'test2'
-		// 	};
-		// 	const newProps = {
-		// 		css: newCss2
-		// 	};
-		// 	foo.componentWillUpdate(newProps);
-		// 	expect(componentWillUpdate).toBeCalled();
-		// 	expect(Foo.prototype.css).toEqual(css); //prototype is still clean
-		// 	expect(foo.css).toEqual({
-		// 		container: 'container',
-		// 		test: 'original test2'
-		// 	});
-		// 	foo.componentWillUpdate({}); //pass empty props without css
-		// 	expect(componentWillUpdate).toBeCalled();
-		// 	expect(Foo.prototype.css).toEqual(css); //prototype is still clean
-		// 	expect(foo.css).toEqual(css); //should take original css module
-		// });
 	});
 });

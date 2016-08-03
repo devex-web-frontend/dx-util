@@ -2,7 +2,7 @@ jest.disableAutomock();
 
 import debounce, {DEBOUNCE} from '../debounce';
 import throttle, {THROTTLE} from '../throttle';
-import memoize, {MEMOIZE} from '../memoize';
+import memoize, {MEMOIZE, MEMOIZE_CLEAR_FUNCTION} from '../memoize';
 import {DISPOSABLE} from '../disposable';
 
 describe('function', () => {
@@ -135,6 +135,22 @@ describe('function', () => {
 			});
 			expect(fn.bind(null, [])).toThrow();
 			expect(fn.bind(null, {})).toThrow();
+		});
+
+		it('should inject clearer function', () => {
+			const callback = jest.fn();
+			const fn = memoize(function(a, b) {
+				callback();
+				return a + b;
+			});
+			expect(fn[MEMOIZE_CLEAR_FUNCTION]).toBeDefined();
+			fn(1, 2);
+			fn(1, 2);
+			expect(callback.mock.calls.length).toBe(1);
+			fn[MEMOIZE_CLEAR_FUNCTION](1, 2);
+			fn(1, 2);
+			fn(1, 2);
+			expect(callback.mock.calls.length).toBe(2);
 		});
 	});
 
