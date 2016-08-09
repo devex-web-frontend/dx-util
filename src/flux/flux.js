@@ -4,13 +4,17 @@
 function TFSAction() { //eslint-disable-line no-empty-function
 }
 /**
- * @type {String}
+ * @type {string|String}
  */
 TFSAction.prototype.type = '';
 /**
  * @type {TFSActionPayload}
  */
 TFSAction.prototype.payload = null;
+
+/**
+ * @typedef {Object} TFSAction
+ */
 
 /**
  * @typedef {TFSAction|TThunkAction} TThunkActionResult
