@@ -1,9 +1,16 @@
 /**
- * @typedef {{}} TFSAction
  * @template TFSActionPayload
- * @property {String} type
- * @property {TFSActionPayload} payload
  */
+function TFSAction() { //eslint-disable-line no-empty-function
+}
+/**
+ * @type {String}
+ */
+TFSAction.prototype.type = '';
+/**
+ * @type {TFSActionPayload}
+ */
+TFSAction.prototype.payload = null;
 
 /**
  * @typedef {TFSAction|TThunkAction} TThunkActionResult
