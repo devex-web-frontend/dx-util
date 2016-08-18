@@ -41,7 +41,7 @@ describe('react', () => {
 	describe('PURE decorator', () => {
 		it('should decorate passed class with shouldComponentUpdate', () => {
 			//
-			@PURE
+			@PURE()
 			class Foo {
 				props = {
 					a: 'a',
@@ -63,7 +63,7 @@ describe('react', () => {
 		});
 		it('should include base shouldComponentUpdate to resulting condition', () => {
 			//
-			@PURE
+			@PURE()
 			class Foo {
 				props = {
 					a: 1
@@ -78,7 +78,7 @@ describe('react', () => {
 				a: 2 //value is different
 			})).toBeFalsy(); //but base shouldComponentUpdate returns false
 		});
-		it('should check props.theme object for equality when using with react-css-themr', () => {
+		it('should check options.shallow objects for equality', () => {
 			const css = {
 				container: 'container'
 			};
@@ -91,20 +91,22 @@ describe('react', () => {
 			const css4 = {
 				test: 'bla'
 			};
-			@PURE
+			@PURE({
+				shallow: ['theme']
+			})
 			class Foo {
 				props = {
 					theme: css2
 				}
 			}
 			const foo = new Foo();
-			expect(foo.shouldComponentUpdate({ //same css
+			expect(foo.shouldComponentUpdate({
 				theme: css2
 			})).toBeFalsy();
-			expect(foo.shouldComponentUpdate({ //different css but with same structure
+			expect(foo.shouldComponentUpdate({
 				theme: css3
 			})).toBeFalsy();
-			expect(foo.shouldComponentUpdate({ //different css
+			expect(foo.shouldComponentUpdate({
 				theme: css4
 			})).toBeTruthy();
 		});
