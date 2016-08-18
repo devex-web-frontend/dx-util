@@ -93,8 +93,8 @@ const properties = [
 
 /**
  * Prefixes vendor keys
- * @param {Object.<String, String>} styles
- * @returns {Object.<String, String>}
+ * @param {{}} styles
+ * @returns {{}}
  */
 export default function prefix(styles) {
 	return Object.keys(styles).reduce((acc, key) => {
