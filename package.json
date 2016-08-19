@@ -1,6 +1,6 @@
 {
   "name": "dx-util",
-  "version": "0.10.19",
+  "version": "0.10.20",
   "description": "Common utilities for dx-projects",
   "main": "./src/",
   "engines": {
@@ -27,7 +27,12 @@
   },
   "homepage": "https://github.com/devex-web-frontend/dx-util#readme",
   "jest": {
-    "scriptPreprocessor": "<rootDir>/node_modules/babel-jest"
+    "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules",
+      "<rootDir>/bower_components",
+      "<rootDir>/esdoc"
+    ]
   },
   "devDependencies": {
     "babel-eslint": "^6.1.0",
@@ -40,8 +45,8 @@
     "dx-lint": "github:devex-web-frontend/dx-lint",
     "esdoc": "^0.4.7",
     "esdoc-es7-plugin": "0.0.3",
-    "eslint": "^2.13.1",
+    "eslint": "^3.2.2",
     "eslint-plugin-babel": "^3.3.0",
-    "jest-cli": "12.0.2"
+    "jest-cli": "^14.1.0"
   }
 }
