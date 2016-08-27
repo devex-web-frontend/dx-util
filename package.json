@@ -7,7 +7,6 @@
     "npm": "^3.0.0"
   },
   "scripts": {
-    "postinstall": "bower install",
     "test": "npm run eslint && npm run jest",
     "jest": "jest",
     "eslint": "eslint --config ./node_modules/dx-lint/.eslintrc --ext .js ./src",
