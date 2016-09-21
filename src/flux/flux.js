@@ -25,5 +25,5 @@ TFSAction.prototype.payload = null;
  */
 
 /**
- * @typedef {function(dispatch:TThunkActionDispatch):TThunkActionResult} TThunkAction
+ * @typedef {function(dispatch:TThunkActionDispatch, getState:function():*):TThunkActionResult} TThunkAction
  */
