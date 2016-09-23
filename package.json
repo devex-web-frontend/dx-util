@@ -46,6 +46,6 @@
     "esdoc-es7-plugin": "0.0.3",
     "eslint": "^3.2.2",
     "eslint-plugin-babel": "^3.3.0",
-    "jest-cli": "^14.1.0"
+    "jest-cli": "^15.1.1"
   }
 }

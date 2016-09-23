@@ -1,5 +1,5 @@
 jest.disableAutomock();
-import {is, shallowEqual, mapKeys} from '../object';
+import {is, deepEqual, shallowEqual, mapKeys} from '../object';
 
 describe('object', () => {
 	describe('mapKeys', () => {
@@ -36,7 +36,16 @@ describe('object', () => {
 			expect(is(+0, +0)).toBeTruthy();
 			expect(is(-0, -0)).toBeTruthy();
 			expect(is(0, -0)).toBeFalsy();
-			expect(is(NaN, 0/0)).toBeTruthy(); //eslint-disable-line space-infix-ops
+			expect(is(NaN, 0 / 0)).toBeTruthy(); //eslint-disable-line space-infix-ops
+		});
+	});
+
+	describe('deepEqual', () => {
+		it('should deeply compare objects', () => {
+			expect(deepEqual({}, {})).toBeTruthy();
+			expect(deepEqual({a: {foo: 1}}, {a: {foo: 1}})).toBeTruthy(); //eslint-disable-line
+			expect(deepEqual({a: {foo: 1}}, {a: {foo: 2}})).toBeFalsy(); //eslint-disable-line
+			expect(deepEqual({a: {foo: 1}}, {a: {bar: 1}})).toBeFalsy(); //eslint-disable-line
 		});
 	});
 });

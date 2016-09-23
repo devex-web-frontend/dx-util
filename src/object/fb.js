@@ -15,7 +15,7 @@
 
 'use strict';
 
-const hasOwnProperty = Object.prototype.hasOwnProperty;
+export const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 /**
  * inlined Object.is polyfill to avoid requiring consumers ship their own
