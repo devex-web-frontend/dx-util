@@ -44,8 +44,8 @@
     "dx-lint": "github:devex-web-frontend/dx-lint",
     "esdoc": "^0.4.7",
     "esdoc-es7-plugin": "0.0.3",
-    "eslint": "^3.2.2",
-    "eslint-plugin-babel": "^3.3.0",
+    "eslint": "~3.2.2",
+    "eslint-plugin-babel": "~3.3.0",
     "jest-cli": "^15.1.1"
   }
 }
