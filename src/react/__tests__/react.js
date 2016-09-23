@@ -1,5 +1,5 @@
 jest.disableAutomock();
-import {shouldComponentUpdate, PURE, DISPOSABLE, CSS} from '../react';
+import {shouldComponentUpdate, PURE, DISPOSABLE} from '../react';
 
 describe('react', () => {
 	describe('shouldComponentUpdate', () => {
@@ -79,9 +79,6 @@ describe('react', () => {
 			})).toBeFalsy(); //but base shouldComponentUpdate returns false
 		});
 		it('should check props.theme object for equality when using with react-css-themr', () => {
-			const css = {
-				container: 'container'
-			};
 			const css2 = { //different objects with same structure
 				test: 'test'
 			};
@@ -106,6 +103,43 @@ describe('react', () => {
 			})).toBeFalsy();
 			expect(foo.shouldComponentUpdate({ //different css
 				theme: css4
+			})).toBeTruthy();
+		});
+		it('should check deep props.theme objects', () => {
+			const css = {
+				test: 'test',
+				nested: {
+					foo: 'bar'
+				}
+			};
+			const css2 = {
+				test: 'test',
+				nested: {
+					foo: 'bar'
+				}
+			};
+			const css3 = {
+				test: 'test',
+				nested: {
+					bar: 'bar'
+				}
+			};
+
+			@PURE
+			class Foo {
+				props = {
+					theme: css
+				}
+			}
+			const foo = new Foo();
+			expect(foo.shouldComponentUpdate({
+				theme: css
+			})).toBeFalsy();
+			expect(foo.shouldComponentUpdate({
+				theme: css2
+			})).toBeFalsy();
+			expect(foo.shouldComponentUpdate({
+				theme: css3
 			})).toBeTruthy();
 		});
 	});

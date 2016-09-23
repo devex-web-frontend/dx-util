@@ -1,6 +1,4 @@
-import {shallowEqual} from '../object/object';
-
-import {CSS_DECORATOR_STORAGE} from './__private__/shared';
+import {shallowEqual, deepEqual} from '../object/object';
 
 /**
  * Pure render checker
@@ -36,9 +34,6 @@ export function PURE(target) {
 		//check props.theme which can be set by react-css-themr
 		const shouldCheckTheme = !!newProps.theme;
 
-		//check props.css if decorated with @CSS and should compare
-		// const shouldCheckCSS = !!target.prototype[CSS_DECORATOR_STORAGE];
-
 		//check shallow equality
 		//will be set further basing on shouldCheckCss
 		let shouldUpdateByEquality;
@@ -55,7 +50,7 @@ export function PURE(target) {
 				//either props has changed (ignoring css)
 				shouldComponentUpdate(thisPropsCopy, this.state, newPropsCopy, newState) ||
 				//or theme has changed
-				shouldComponentUpdate(this.props.theme, null, newProps.theme, null);
+				!deepEqual(this.props.theme, newProps.theme);
 		} else {
 			//we don't need to do anything with the props so just call shouldComponentUpdate
 			shouldUpdateByEquality = shouldComponentUpdate(this.props, this.state, newProps, newState);
