@@ -26,11 +26,14 @@
   },
   "homepage": "https://github.com/devex-web-frontend/dx-util#readme",
   "jest": {
+    "timers": "fake",
     "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
-    "testPathIgnorePatterns": [
-      "<rootDir>/node_modules",
-      "<rootDir>/bower_components",
-      "<rootDir>/esdoc"
+    "moduleDirectories": [
+      "node_modules",
+      "bower_components"
+    ],
+    "testPathDirs": [
+      "<rootDir>/src"
     ]
   },
   "devDependencies": {
@@ -46,6 +49,6 @@
     "esdoc-es7-plugin": "0.0.3",
     "eslint": "~3.2.2",
     "eslint-plugin-babel": "~3.3.0",
-    "jest-cli": "^15.1.1"
+    "jest-cli": "^16.0.2"
   }
 }

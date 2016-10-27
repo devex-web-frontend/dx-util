@@ -1,6 +1,7 @@
-jest.unmock('../string.js');
+jest.disableAutomock();
 
 import {dasherize, camelize, capitalize, randomId, decapitalize, pluralize3, pluralize2} from '../string';
+import split from '../split';
 
 describe('string', () => {
 	describe('dasherize', () => {
@@ -99,6 +100,58 @@ describe('string', () => {
 			expect(pluralize2(19, declensions)).toBe('zero-many');
 			expect(pluralize2(20, declensions)).toBe('zero-many');
 			expect(pluralize2(21, declensions)).toBe('one');
+		});
+	});
+
+	describe('split', () => {
+		it('should return string if no substring passed', () => {
+			const string = 'abc';
+			const result = split(string, (void 0)); //eslint-disable-line no-void
+			expect(result[0]).toBe(string);
+		});
+
+		it('should split by substring', () => {
+			expect(split('abc', 'b')).toEqual(['a', 'b', 'c']);
+		});
+
+		it('should be case sensitive by default', () => {
+			expect(split('abc', 'B')).toEqual(['abc']);
+		});
+
+		it('should accept caseSensitive flag', () => {
+			expect(split('abc', 'B', false)).toEqual(['a', 'b', 'c']);
+			expect(split('abc', 'B', true)).toEqual(['abc']);
+		});
+
+		it('should accept zero as substring', () => {
+			expect(split('a0c', '0')).toEqual(['a', '0', 'c']);
+		});
+
+		it('should support special characters', () => {
+			[
+				'[',
+				']',
+				'{',
+				'}',
+				'(',
+				')',
+				'*',
+				'+',
+				'?',
+				'!',
+				'.',
+				',',
+				'\\',
+				'/',
+				'^',
+				'$',
+				'|',
+				'#',
+				'1 1', //spaces
+				'1\t1', //tabs
+				'1\n1',
+				'1\r1',
+			].forEach(char => expect(split(`a${char}`, char)).toEqual(['a', char, '']));
 		});
 	});
 });
