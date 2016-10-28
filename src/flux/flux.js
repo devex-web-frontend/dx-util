@@ -13,6 +13,11 @@ TFSAction.prototype.type = '';
 TFSAction.prototype.payload = null;
 
 /**
+ * @type {*}
+ */
+TFSAction.prototype.error = (void 0); //eslint-disable-line no-void
+
+/**
  * @typedef {Object} TFSAction
  */
 
