@@ -15,7 +15,7 @@ TFSAction.prototype.payload = null;
 /**
  * @type {*}
  */
-TFSAction.prototype.error = (void 0); //eslint-disable-line no-void
+TFSAction.prototype.error = null;
 
 /**
  * @typedef {Object} TFSAction
