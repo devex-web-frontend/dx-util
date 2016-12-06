@@ -34,10 +34,12 @@ class Session extends Emitter {
 
 	constructor() {
 		super();
-		window.addEventListener('storage', this._onStorage);
-		this._using([
-			window.removeEventListener('storage', this._onStorage)
-		]);
+		if (typeof window !== 'undefined') {
+			window.addEventListener('storage', this._onStorage);
+			this._using([
+				window.removeEventListener('storage', this._onStorage)
+			]);
+		}
 	}
 
 	/**
@@ -50,7 +52,9 @@ class Session extends Emitter {
 			receiver: sid,
 			request
 		});
-		window.localStorage.setItem(EVENT_KEY, data);
+		if (typeof window !== 'undefined') {
+			window.localStorage.setItem(EVENT_KEY, data);
+		}
 	}
 
 	/**
@@ -72,8 +76,4 @@ class Session extends Emitter {
 	}
 }
 
-export default typeof window !== 'undefined' ? new Session() : {
-	id,
-	send(sid, request) {
-	}
-};
+export default new Session();
