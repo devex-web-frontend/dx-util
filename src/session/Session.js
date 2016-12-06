@@ -2,7 +2,6 @@ import {uuid} from '../string/string';
 import {DISPOSABLE} from '../function/disposable';
 import Emitter from '../emitter/Emitter';
 
-
 const id = uuid();
 const EVENT_KEY = '__SESSION_EVENT__';
 
