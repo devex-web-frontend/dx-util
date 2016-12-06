@@ -13,9 +13,10 @@ export const E_SESSION = {
 };
 
 /**
- * @typedef {{}} TRequestEvent
- * @property {String} receiver - sid
- * @property {*} request
+ * @typedef {{}} TRequestData
+ * @property {String} receiver_sid
+ * @property {*} messageType
+ * @property {*} payload
  */
 
 /**
@@ -44,12 +45,14 @@ class Session extends Emitter {
 	/**
 	 * Sends message to another session by id
 	 * @param {String} sid
-	 * @param {*} request
+	 * @param {*} messageType
+	 * @param {*} payload
 	 */
-	send(sid, request) {
+	send(sid, messageType, payload) {
 		const data = JSON.stringify({
-			receiver: sid,
-			request
+			receiver_sid: sid,
+			messageType,
+			payload
 		});
 		if (typeof window !== 'undefined') {
 			window.localStorage.setItem(EVENT_KEY, data);
@@ -64,11 +67,12 @@ class Session extends Emitter {
 		if (event.key === EVENT_KEY) {
 			try {
 				/**
-				 * @type {TRequestEvent}
+				 * @type {TRequestData}
 				 */
 				const value = JSON.parse(event.newValue);
-				if (value.receiver === id) {
-					this._emit(E_SESSION.REQUEST, value.request);
+				if (value.receiver_sid === id) {
+					this._emit(E_SESSION.REQUEST, value.messageType, value.payload);
+					this._emit(value.messageType, value.payload);
 				}
 			} catch (e) {}
 		}
