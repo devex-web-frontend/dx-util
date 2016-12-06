@@ -37,7 +37,7 @@ class Session extends Emitter {
 		if (typeof window !== 'undefined') {
 			window.addEventListener('storage', this._onStorage);
 			this._using([
-				window.removeEventListener('storage', this._onStorage)
+				() => window.removeEventListener('storage', this._onStorage)
 			]);
 		}
 	}
