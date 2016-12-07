@@ -65,16 +65,17 @@ class Session extends Emitter {
 	 */
 	_onStorage = (event) => {
 		if (event.key === EVENT_KEY) {
+			/**
+			 * @type {TRequestData}
+			 */
+			let value;
 			try {
-				/**
-				 * @type {TRequestData}
-				 */
-				const value = JSON.parse(event.newValue);
-				if (value.receiver_sid === id) {
-					this._emit(E_SESSION.REQUEST, value.messageType, value.payload);
-					this._emit(value.messageType, value.payload);
-				}
+				value = JSON.parse(event.newValue);
 			} catch (e) {}
+			if (value && value.receiver_sid === id) {
+				this._emit(E_SESSION.REQUEST, value.messageType, value.payload);
+				this._emit(value.messageType, value.payload);
+			}
 		}
 	}
 }
