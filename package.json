@@ -3,15 +3,13 @@
   "version": "0.10.31",
   "description": "Common utilities for dx-projects",
   "main": "./lib/",
-  "engines": {
-    "npm": "^3.0.0"
-  },
   "scripts": {
-    "test": "npm run jest",
+    "test": "npm run tslint && npm run jest",
     "jest": "jest",
     "start": "jest --watch",
     "clean": "rm -rf lib",
-    "build": "npm run clean && tsc --"
+    "build": "npm run clean && npm run test && tsc --",
+    "tslint": "tslint './src/**/*.ts'"
   },
   "repository": {
     "type": "git",

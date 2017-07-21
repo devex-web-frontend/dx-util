@@ -49,4 +49,3 @@ export function deepEqual(objA: object, objB: object): boolean {
 
 	return true;
 }
-
