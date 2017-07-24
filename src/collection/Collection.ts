@@ -18,7 +18,7 @@ export type TCollectionOptions = {
 /**
  * Basic observable collection
  */
-export default class Collection<T> extends Emitter {
+export class Collection<T> extends Emitter {
 	private _items: T[];
 	private _options: TCollectionOptions;
 
@@ -163,3 +163,5 @@ export default class Collection<T> extends Emitter {
 		}
 	}
 }
+
+export default Collection;
