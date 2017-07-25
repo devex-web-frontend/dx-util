@@ -63,8 +63,6 @@ export declare function modifier(name: string, modifier: string | number): strin
 export default function bem(blockName: string, elementOrBlockModifiers?: any, elementModifiers?: any): string;
 /**
  * Class decorator, injects 'bem' method which is bound to passed block name
- * @param {String} blockName
- * @returns {Function.<Function>}
  * @example
  * @BEM('foo')
  * class Foo extends React.Component {

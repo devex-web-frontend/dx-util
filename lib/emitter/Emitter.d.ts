@@ -1,5 +1,5 @@
-export declare type IEmitterEvents = {
-    [key: string]: Function[];
+export declare type IEmitterEvents<F extends Function = Function> = {
+    [key: string]: F[];
 };
 /**
  * Basic event emitter
@@ -9,11 +9,11 @@ export default class Emitter {
     /**
      * Binds handler to specified event
      */
-    on(event: string, handler: Function): () => void;
+    on<H extends Function>(event: string, handler: H): () => void;
     /**
      * Unbinds handler from specified event. If handler is not specified, all callbacks are unbound.
      */
-    off(event: string, handler: Function): void;
+    off<H extends Function>(event: string, handler: H): void;
     /**
      * Emits event
      */

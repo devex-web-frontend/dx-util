@@ -89,7 +89,7 @@ describe('function', () => {
 	describe('memoize', () => {
 		it('should memoize passed function for it\'s arguments', () => {
 			const callback = jest.fn();
-			const fn = memoize(function (a, b) {
+			const fn = memoize(function (a: number, b: number) {
 				callback();
 				return a + b;
 			});
@@ -107,7 +107,7 @@ describe('function', () => {
 
 		it('should inject clearer function', () => {
 			const callback = jest.fn();
-			const fn = memoize(function (a, b) {
+			const fn = memoize(function (a: number, b: number) {
 				callback();
 				return a + b;
 			});

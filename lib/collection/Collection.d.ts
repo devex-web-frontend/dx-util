@@ -13,7 +13,7 @@ export declare type TCollectionOptions = {
 /**
  * Basic observable collection
  */
-export default class Collection<T> extends Emitter {
+export declare class Collection<T> extends Emitter {
     private _items;
     private _options;
     /**
@@ -80,3 +80,4 @@ export default class Collection<T> extends Emitter {
      */
     private _requireWriteAccess();
 }
+export default Collection;

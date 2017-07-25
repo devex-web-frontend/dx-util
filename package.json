@@ -8,7 +8,7 @@
     "jest": "jest",
     "start": "jest --watch",
     "clean": "rm -rf lib",
-    "build": "npm run clean && npm run test && tsc --",
+    "build": "npm run clean && npm run test && tsc",
     "tslint": "tslint './src/**/*.ts'"
   },
   "repository": {
