@@ -29,19 +29,24 @@ type TResult<P extends TTargetProps> = ComponentClass<TResultProps<P>>;
 //shortcuts
 type CC<P> = ComponentClass<P>;
 
-export function theme(name: string | symbol, defaultTheme?: TTheme) {
+export function theme(name: string | symbol, defaultTheme: TTheme = {}) {
 	function decorate<P extends TTargetProps>(Target: SFC<P & TTargetProps> & TWithConfig): TResult<P>;
 	function decorate<P extends TTargetProps>(Target: CC<P & TTargetProps> & TWithConfig): TResult<P>;
 	function decorate<P extends TTargetProps>(Target:
 		(SFC<P & TTargetProps> | CC<P & TTargetProps>) & TWithConfig): TResult<P> {
-		const config = Target.config;
-		if (config && config.name === name) {
+
+		if (Target.config && Target.config.name === name) {
 			//already wrapped - just merge in new defaultTheme
-			config.theme = mergeTwo(config.theme, defaultTheme);
+			Target.config.theme = mergeTwo(Target.config.theme, defaultTheme);
 			return Target as any;
 		}
 
-		return class Themed extends Component<TResultProps<P>, never> {
+		const config = {
+			name,
+			theme: defaultTheme
+		};
+
+		class Themed extends Component<TResultProps<P>, never> {
 			static displayName = `Themed(${Target.name})`;
 
 			static contextTypes = {
@@ -51,11 +56,15 @@ export function theme(name: string | symbol, defaultTheme?: TTheme) {
 			render() {
 				const props = {
 					...this.props,
-					theme: mergeTwo(mergeTwo(defaultTheme, this.context.theme[name]), this.props.theme)
+					theme: mergeTwo(mergeTwo(config.theme, this.context.theme[name]), this.props.theme)
 				};
 				return createElement(Target as any, props);
 			}
-		};
+		}
+
+		Themed[THEME_CONFIG_KEY] = config;
+
+		return Themed;
 	}
 
 	return decorate;
