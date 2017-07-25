@@ -179,8 +179,6 @@ export default function bem(blockName: string, elementOrBlockModifiers?: any, el
 
 /**
  * Class decorator, injects 'bem' method which is bound to passed block name
- * @param {String} blockName
- * @returns {Function.<Function>}
  * @example
  * @BEM('foo')
  * class Foo extends React.Component {

@@ -1,5 +1,5 @@
-export type IEmitterEvents = {
-	[key: string]: Function[]
+export type IEmitterEvents<F extends Function = Function> = {
+	[key: string]: F[]
 };
 
 /**
@@ -11,7 +11,7 @@ export default class Emitter {
 	/**
 	 * Binds handler to specified event
 	 */
-	on(event: string, handler: Function): () => void {
+	on<H extends Function>(event: string, handler: H): () => void {
 		if (this._events[event]) {
 			this._events[event].push(handler);
 		} else {
@@ -23,7 +23,7 @@ export default class Emitter {
 	/**
 	 * Unbinds handler from specified event. If handler is not specified, all callbacks are unbound.
 	 */
-	off(event: string, handler: Function): void {
+	off<H extends Function>(event: string, handler: H): void {
 		if (handler) {
 			const handlers = this._events[event];
 			if (handlers) {

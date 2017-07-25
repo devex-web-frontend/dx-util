@@ -121,12 +121,7 @@ function extractContext(context: {}) {
 	return context === CONTEXT ? context['context'] : context;
 }
 
-/**
- * @param {Function} method
- * @param {*} context
- * @returns {{}}
- */
-function composeContext(method: Function, context: {}) {
+function composeContext<F extends Function>(method: F, context: {}) {
 	//we need to detect if old method is overridden to work with custom context
 	if (method[CSS_DECORATOR_OVERRIDE_MARKER]) {
 		//call in special context to differ from usual call
@@ -137,9 +132,6 @@ function composeContext(method: Function, context: {}) {
 	return context;
 }
 
-/**
- * @param {Function} method
- */
-function overrideMethod(method: Function) {
+function overrideMethod<F extends Function>(method: F) {
 	method[CSS_DECORATOR_OVERRIDE_MARKER] = true;
 }

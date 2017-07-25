@@ -2,12 +2,8 @@
  * Returns a function, that, as long as it continues to be invoked, will not be triggered.
  * The function will be called after it stops being called for N milliseconds.
  * If immediate is passed, trigger the function on the leading edge, instead of the trailing.
- * @param {Function} func Function to decorate
- * @param {Number} [wait=0] Delay in ms
- * @param {Boolean} [immediate=false] Should be function invoked on the leading edge
- * @returns {Function} Decorated function
  */
-export default function debounce(func: Function, wait: number = 0, immediate: boolean = false): Function {
+export default function debounce<F extends Function>(func: F, wait: number = 0, immediate: boolean = false): F {
 	let timeout: any;
 	let args: any;
 	let context: any;
@@ -47,15 +43,11 @@ export default function debounce(func: Function, wait: number = 0, immediate: bo
 		}
 
 		return result;
-	};
+	} as any;
 }
 
 /**
  * Class method decorator for {@link debounce}.
- * @param {Number} [wait=0] Delay in ms
- * @param {Boolean} [immediate=false] Should be function invoked on the leading edge
- * @returns {Function}
- * @constructor
  */
 export function DEBOUNCE(wait: number = 0, immediate: boolean = false): any {
 	return function (target: any, prop: any, descriptor?: any): any {

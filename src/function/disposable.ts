@@ -1,11 +1,9 @@
 export function DISPOSABLE(target: any) {
 	/**
-	 * @param {Array.<Function>} disposables
 	 * @protected
 	 */
-	target.prototype._using = function (disposables: Function[]) {
+	target.prototype._using = function _using<F extends Function>(disposables: F[]) {
 		/**
-		 * @type {Array.<Function>}
 		 * @private
 		 */
 		this._disposables = (this._disposables || []).concat(disposables);

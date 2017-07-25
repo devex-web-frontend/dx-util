@@ -5,10 +5,8 @@ export const MEMOIZE_CLEAR_FUNCTION = Symbol('MEMOIZE_CLEAR_FUNCTION');
 
 /**
  * Memoizes function for passed arguments
- * @param {Function} fn
- * @returns {Function}
  */
-export function memoize(this: any, fn: (...args: any[]) => any): Function {
+export function memoize<F extends Function>(this: any, fn: F): F {
 	const storage = {};
 	const result = function (this: any) {
 		const args = Array.prototype.slice.call(arguments);
