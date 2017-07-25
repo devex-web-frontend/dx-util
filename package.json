@@ -9,7 +9,7 @@
     "start": "jest --watch",
     "clean": "rm -rf lib",
     "build": "npm run clean && npm run test && tsc",
-    "tslint": "tslint './src/**/*.ts'"
+    "tslint": "tslint './src/**/*.ts' './src/**/*.tsx'"
   },
   "repository": {
     "type": "git",
