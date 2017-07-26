@@ -1,6 +1,6 @@
 {
   "name": "dx-util",
-  "version": "0.11.3",
+  "version": "0.11.4",
   "description": "Common utilities for dx-projects",
   "main": "./lib/",
   "scripts": {
