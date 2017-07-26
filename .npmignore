@@ -1,0 +1,5 @@
+lib/**/__tests__
+src
+.gitignore
+.idea
+.vscode
