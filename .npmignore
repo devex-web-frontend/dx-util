@@ -3,3 +3,10 @@ src
 .gitignore
 .idea
 .vscode
+bash.exe.stackdump
+package-lock.json
+tslint.json
+scripts
+.npmignore
+.editorconfig
+tsconfig.json
