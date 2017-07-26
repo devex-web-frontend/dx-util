@@ -51,5 +51,5 @@ crashlytics-build.properties
 
 npm-debug.log*
 node_modules
-lib/**/__tests__
+lib
 bash.exe.stackdump
