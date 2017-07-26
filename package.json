@@ -29,13 +29,12 @@
     "timers": "fake",
     "moduleFileExtensions": [
       "js",
-      "ts",
-      "tsx"
+      "ts"
     ],
     "transform": {
       "^.+\\.(ts|tsx)$": "<rootDir>/scripts/jest/typescriptTransform.js"
     },
-    "testRegex": "/__tests__/.*\\.(ts|tsx|js|jsx)$",
+    "testRegex": "/__tests__/.*\\.(ts|js)$",
     "automock": false
   },
   "devDependencies": {
