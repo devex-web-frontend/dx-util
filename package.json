@@ -40,17 +40,12 @@
   },
   "devDependencies": {
     "@types/jest": "^20.0.4",
-    "@types/prop-types": "^15.5.1",
-    "@types/react": "^15.0.39",
     "dx-lint": "https://github.com/devex-web-frontend/dx-lint.git#0.4.1",
     "jest-cli": "^20.0.4",
-    "prop-types": "^15.5.10",
-    "react": "^15.6.1",
     "tslib": "^1.7.1",
     "tslint": "^5.5.0",
     "typescript": "^2.4.2"
   },
   "dependencies": {
-    "typelevel-ts": "^0.1.3"
   }
 }
