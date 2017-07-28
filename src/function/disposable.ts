@@ -1,4 +1,4 @@
-export function DISPOSABLE(target: any) {
+export function DISPOSABLE<T extends Function>(target: T): T {
 	/**
 	 * @protected
 	 */
