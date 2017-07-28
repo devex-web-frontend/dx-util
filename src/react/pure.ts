@@ -15,7 +15,7 @@ export function shouldComponentUpdate(props: {}, state: {}, newProps: {}, newSta
 /**
  * Pure render recorator
  */
-export function PURE(target: any): any {
+export function PURE<T extends Function>(target: T): T {
 	//noinspection JSUnresolvedVariable
 	const oldShouldComponentUpdate = target.prototype.shouldComponentUpdate;
 	/**
