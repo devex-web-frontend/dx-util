@@ -1,3 +1,5 @@
+import { ObjectClean, ObjectOmit } from 'typelevel-ts';
+
 export { is, shallowEqual } from './fb';
 import { is, hasOwnProperty } from './fb';
 
@@ -46,3 +48,5 @@ export function deepEqual(objA: object, objB: object): boolean {
 
 	return true;
 }
+
+export type PartialKeys<T extends {}, K extends keyof T> = ObjectClean<ObjectOmit<T, K> & Partial<Pick<T, K>>>;
