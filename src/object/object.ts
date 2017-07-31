@@ -49,4 +49,4 @@ export function deepEqual(objA: object, objB: object): boolean {
 	return true;
 }
 
-export type PartialKeys<T extends {}, K extends keyof T> = ObjectClean<ObjectOmit<T, K> & Partial<Pick<T, K>>>;
+export type PartialKeys<T extends {}, K extends keyof T> = ObjectOmit<T, K> & Partial<Pick<T, K>>;
