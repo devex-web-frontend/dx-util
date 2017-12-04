@@ -6,6 +6,7 @@ export const MEMOIZE_CLEAR_FUNCTION = Symbol('MEMOIZE_CLEAR_FUNCTION');
 /**
  * Memoizes function for passed arguments
  */
+export function memoize<A>(this: any, fn: () => A): () => A;
 export function memoize<A, B>(this: any, fn: (a: A) => B): (a: A) => B;
 export function memoize<A, B, C>(this: any, fn: (a: A, b: B) => C): (a: A, b: B) => C;
 export function memoize<A, B, C, D>(this: any, fn: (a: A, b: B, c: C) => D): (a: A, b: B, c: C) => D;
