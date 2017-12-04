@@ -6,7 +6,10 @@ export const MEMOIZE_CLEAR_FUNCTION = Symbol('MEMOIZE_CLEAR_FUNCTION');
 /**
  * Memoizes function for passed arguments
  */
-export function memoize<F extends Function>(this: any, fn: F): F {
+export function memoize<A, B>(this: any, fn: (a: A) => B): (a: A) => B;
+export function memoize<A, B, C>(this: any, fn: (a: A, b: B) => C): (a: A, b: B) => C;
+export function memoize<A, B, C, D>(this: any, fn: (a: A, b: B, c: C) => D): (a: A, b: B, c: C) => D;
+export function memoize<A, B, C, D, E>(this: any, fn: (a: A, b: B, c: C, d: D) => E): (a: A, b: B, c: C, d: D) => E {
 	const storage = {};
 	const result = function (this: any) {
 		const args = Array.prototype.slice.call(arguments);
